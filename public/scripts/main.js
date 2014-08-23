@@ -163,7 +163,7 @@ window.addEventListener("load",function() {
 				speed: 64,
 				animState: 0,
 				type: Q.SPRITE_PLAYER,
-				collisionMask: Q.SPRITE_WALL | Q.SPRITE_COLLECTABLE,
+				collisionMask: Q.SPRITE_WALL | Q.SPRITE_COLLECTABLE | Q.SPRITE_BULLET,
 				health: 5,
 				items: 0
 
