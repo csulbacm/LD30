@@ -135,7 +135,7 @@ window.addEventListener("load",function() {
 		standing: 	{ frames: [28] }
 	});
 
-	Q.Sprite.extend('Follower', {
+	Q.Sprite.extend('Enemy', {
 		init: function(p){
 			this._super(p, {
 				sheet: 'player',
@@ -214,10 +214,10 @@ window.addEventListener("load",function() {
 	Q.scene('level1', function(stage){
 		player = stage.insert(new Q.Player());
 		var previous = player;
-		var followers = [];
+		var enemys = [];
 		for(var i =0; i< 5; i++) {
-			followers.push( stage.insert(new Q.Follower({ x: 110+100*i, y: 110+100*i, target: previous, stage: stage})) );
-			previous = followers[i];
+			enemys.push( stage.insert(new Q.Enemy({ x: 110+100*i, y: 110+100*i, target: previous, stage: stage})) );
+			previous = enemys[i];
 		}
 		var las = stage.insert(new Q.Laser());
 		stage.add('viewport').follow(player);
