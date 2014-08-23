@@ -130,7 +130,7 @@ window.addEventListener("load",function() {
 		s = Math.sqrt(dx*dx+dy*dy);
 		dx *= this.speed/s;
 		dy *= this.speed/s;
-		thisAi.self.p.stage.insert(new Q.Laser({ x:thisAi.self.p.x, y: thisAi.self.p.y,vx:dx, vy:dy, range: this.range}));
+		thisAi.self.p.stage.insert(new Q.Laser({ x:thisAi.self.p.x, y: thisAi.self.p.y,vx:dx, vy:dy, range: this.range, angle: ((Math.atan2(dy, dx) * 180/Math.PI) + 90)}));
 		thisAi.remove(this);
 	}
 
@@ -412,4 +412,3 @@ window.addEventListener("load",function() {
 		Q.stageScene('level1');
 	});
 });
-
