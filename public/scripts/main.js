@@ -225,9 +225,13 @@ window.addEventListener("load",function() {
 		step: function(dt){
 			this.p.x += this.p.vx * dt;
 			this.p.y += this.p.vy * dt;
-			this.distance += Math.sqrt(this.p.vx * dt*this.p.vx * dt + this.p.vy * dt*this.p.vy * dt);
+			step_size = Math.sqrt(this.p.vx * dt*this.p.vx * dt + this.p.vy * dt*this.p.vy * dt);
+			this.distance += step_size;
 			if(this.distance > this.range)
 				this.destroy();
+			else if(step_size < .1) {
+				this.destroy();
+			}
 		}
 
 	});
@@ -293,6 +297,16 @@ window.addEventListener("load",function() {
 
 		Q.stageScene('level1');
 	});
+
+
+
+
+
+
+
+
+
+
 	//setup ai stuff ==============================
 	function Ai(self) {
 		this.behaviors = new Array();
@@ -389,10 +403,12 @@ window.addEventListener("load",function() {
 		//find v
 		dx = (this.targetx-thisAi.self.p.x);
 		dy = (this.targety-thisAi.self.p.y);
-		s = Math.sqrt(dx*dx+dy*dy);
-		dx *= this.speed/s;
-		dy *= this.speed/s;
-		thisAi.self.p.stage.insert(new Q.Laser({ x:thisAi.self.p.x, y: thisAi.self.p.y,vx:dx, vy:dy, range: this.range, angle: ((Math.atan2(dy, dx) * 180/Math.PI) + 90)}));
+		angle = ((Math.atan2(dy, dx) * 180/Math.PI))
+		//add some randomness
+		angle += (Math.random()-.5)*45;
+		dx = Math.cos(angle*Math.PI/180)*this.speed;
+		dy = Math.sin(angle*Math.PI/180)*this.speed;
+		thisAi.self.p.stage.insert(new Q.Laser({ x:thisAi.self.p.x, y: thisAi.self.p.y,vx:dx, vy:dy, range: this.range, angle: angle+90}));
 		thisAi.remove(this);
 	}
 
