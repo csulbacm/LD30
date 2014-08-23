@@ -1,7 +1,7 @@
 window.addEventListener("load",function() {
-	var Q = Quintus()
+	var Q = Quintus({ development: true })
 			.include('Sprites, Scenes, Input, 2D, Anim, UI')
-			.setup('game-canvas');
+			.setup({ maximize: true });
 
 	Q.input.keyboardControls({
 		87: 'W',
@@ -12,6 +12,12 @@ window.addEventListener("load",function() {
 	Q.input.joypadControls();
 
 	Q.gravityX = Q.gravityY = 0;
+
+	Q.SPRITE_NONE = 0;
+	Q.SPRITE_PLAYER = 1;
+	Q.SPRITE_COLLECTABLE = 2;
+	Q.SPRITE_ENEMY = 4;
+	Q.SPRITE_DOOR = 8;
 
 	Q.Sprite.extend('Player', {
 		init: function(p){
@@ -39,7 +45,8 @@ window.addEventListener("load",function() {
 				direct_right: 1,
 				direct_up: 2,
 				direct_left: 4,
-				direct_down: 8
+				direct_down: 8,
+				type: Q.SPRITE_PLAYER
 
 			});
 
@@ -107,14 +114,14 @@ window.addEventListener("load",function() {
 	});
 
 	Q.animations('player', {
-		run_right: 	{ frames: [ 0,  1,  2,  3,  4,  5,  6], rate: 1/10 },
-		run_up: 	{ frames: [ 7,  8,  9, 10, 11, 12, 13], rate: 1/10 },
-		run_dur: 	{ frames: [14, 15, 16, 17, 18, 19, 20], rate: 1/10 },
-		run_dul: 	{ frames: [21, 22, 23, 24, 25, 26, 27], rate: 1/10 },
-		run_down: 	{ frames: [28, 29, 30, 31, 32, 33, 34], rate: 1/10 },
-		run_ddr: 	{ frames: [35, 36, 37, 38, 39, 40, 41], rate: 1/10 },
-		run_ddl: 	{ frames: [42, 43, 44, 45, 46, 47, 48], rate: 1/10 },
-		run_left: 	{ frames: [49, 50, 51, 52, 53, 54, 55], rate: 1/10 },
+		run_right: 	{ frames: [ 0,  1,  2,  3,  4,  5,  6], rate: 1/15 },
+		run_up: 	{ frames: [ 7,  8,  9, 10, 11, 12, 13], rate: 1/15 },
+		run_dur: 	{ frames: [14, 15, 16, 17, 18, 19, 20], rate: 1/15 },
+		run_dul: 	{ frames: [21, 22, 23, 24, 25, 26, 27], rate: 1/15 },
+		run_down: 	{ frames: [28, 29, 30, 31, 32, 33, 34], rate: 1/15 },
+		run_ddr: 	{ frames: [35, 36, 37, 38, 39, 40, 41], rate: 1/15 },
+		run_ddl: 	{ frames: [42, 43, 44, 45, 46, 47, 48], rate: 1/15 },
+		run_left: 	{ frames: [49, 50, 51, 52, 53, 54, 55], rate: 1/15 },
 		standing: 	{ frames: [28] }
 	});
 
@@ -145,7 +152,9 @@ window.addEventListener("load",function() {
 				direct_up: 2,
 				direct_left: 4,
 				direct_down: 8,
-				target: this
+				target: this,
+				type: Q.SPRITE_ENEMY,
+				collisionMask: Q.SPRITE_NONE
 
 			});
 			this.add('2d, animation');
@@ -204,9 +213,13 @@ window.addEventListener("load",function() {
 		var player = stage.insert(new Q.Player());
 		//var player2 = stage.insert(new Q.Follower({ x: 110, y: 110, target: player}));
 		//var followers = new Array[];
-		//for(var i =0; i< 5; i++) {
-			//followers[i] = stage.insert(new Q.Follower({ x: 110+10*i, y: 110+10*i, target: player}));
-		//}
+		var previous = player;
+		var followers = [];
+		for(var i =0; i< 50; i++) {
+			followers.push( stage.insert(new Q.Follower({ x: 110+100*i, y: 110+100*i, target: previous})) );
+			previous = followers[i];
+		}
+		stage.add('viewport').follow(player);
 	});
 
 	Q.load('/images/dragon_hit1.png', function(){
