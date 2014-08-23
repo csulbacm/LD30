@@ -155,7 +155,7 @@ window.addEventListener("load",function() {
 				target: this,
 				type: Q.SPRITE_ENEMY,
 				collisionMask: Q.SPRITE_NONE,
-				projectile: 0
+				projectile: null
 
 			});
 			this.add('2d, animation');
@@ -179,7 +179,7 @@ window.addEventListener("load",function() {
 			this.p.x += this.p.vx * dt;
 			this.p.y += this.p.vy * dt;
 
-			if(this.p.projectile == 0) {
+			if(this.p.projectile == null) {
 				this.p.projectile = this.p.stage.insert(new Q.Laser({ x:this.p.x, y: this.p.y,vx:this.p.vx, vy:this.p.vy, shooter: this}))
 			}
 		},
@@ -212,15 +212,17 @@ window.addEventListener("load",function() {
 				vy: 0,
 				speed: 100,
 				target: this,
-				shooter: 0
+				collisionMask: Q.SPRITE_NONE,
+				shooter: null
 
 			});
 			this.add('2d');
 
 			this.on('hit.sprite', function(collision){
-				if(true || collision.obj.isA('Player')){
+				if(collision.obj.isA('Player')){
 					//Q.stageScene('endGame', 1, { label: 'You Won' });
-					this.shooter.p.projectile = 0;
+					if(this.p.shooter)
+						this.p.shooter.p.projectile = null;
 					this.destroy();
 					//collision.destroy();
 				}
@@ -230,12 +232,17 @@ window.addEventListener("load",function() {
 		step: function(dt){
 			this.p.x += this.p.vx * dt;
 			this.p.y += this.p.vy * dt;
+			if(Math.abs(this.p.x-player.p.x)+Math.abs(this.p.y-player.p.y) > 200){
+				this.p.shooter.p.projectile = null;
+				this.destroy();
+			}
 		}
 
 	});
 
+	var player;
 	Q.scene('level1', function(stage){
-		var player = stage.insert(new Q.Player());
+		player = stage.insert(new Q.Player());
 		//var player2 = stage.insert(new Q.Follower({ x: 110, y: 110, target: player}));
 		//var followers = new Array[];
 		var previous = player;
