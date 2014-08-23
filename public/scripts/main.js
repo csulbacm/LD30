@@ -320,19 +320,19 @@ window.addEventListener("load",function() {
 				target: this,
 				range: 1000,
 				distance: 0,
-				collisionMask: Q.SPRITE_WALL | Q.SPRITE_BULLET,
+				collisionMask: Q.SPRITE_WALL | Q.SPRITE_BULLET | Q.SPRITE_PLAYER,
 				shooter: null,
 				type: Q.SPRITE_BULLET
 
 			});
 			this.add('2d');
 
-			this.on('hit.sprite', function(collision){
+			this.on('hit', function(collision){
 				if(collision.obj.isA('Player')){
 					if(this.p.shooter)
 						this.p.shooter.p.projectile = null;
 					this.destroy();
-				} else if(collision.obj.isA('Wall')) {
+				} else if( collision.obj.p.type == Q.SPRITE_WALL ){
 					if(this.p.shooter)
 						this.p.shooter.p.projectile = null;
 					this.destroy();
