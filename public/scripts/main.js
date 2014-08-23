@@ -35,7 +35,9 @@ window.addEventListener("load",function() {
 				speed: 64,
 				animState: 0,
 				type: Q.SPRITE_PLAYER,
-				health: 5
+				collisionMask: Q.SPRITE_WALL | Q.SPRITE_COLLECTABLE,
+				health: 5,
+				items: 0
 
 			});
 
@@ -121,6 +123,10 @@ window.addEventListener("load",function() {
 			this.p.health -= dmg;
 			if( this.p.health <= 0 )
 				this.destroy();
+		},
+
+		foundItem: function(){
+			this.p.items += 1;
 		}
 
 	});
@@ -137,8 +143,6 @@ window.addEventListener("load",function() {
 		standing: 	{ frames: [28] }
 	});
 
-	/*
-	*/
 	Q.Sprite.extend('Enemy', {
 		init: function(p){
 			this._super(p, {
@@ -168,8 +172,16 @@ window.addEventListener("load",function() {
 			//this.p.x += this.p.vx * dt;
 			//this.p.y += this.p.vy * dt;
 
+			var laserData = {
+				x: ( this.p.x + this.p.w + 10 ),
+				y: ( this.p.y + this.p.h + 40 ),
+				vx: ( this.p.vx * 1.5 ),
+				vy: ( this.p.vy * 1.5 ),
+				shooter: this
+
+			}
 			if(this.p.projectile == null) {
-				this.p.projectile = this.p.stage.insert(new Q.Laser({ x:this.p.x, y: this.p.y,vx:this.p.vx, vy:this.p.vy, shooter: this}))
+				this.p.projectile = this.p.stage.insert(new Q.Laser(laserData))
 			}
 		},
 
@@ -185,8 +197,8 @@ window.addEventListener("load",function() {
 				vy: 0,
 				speed: 100,
 				target: this,
-				collisionMask: Q.SPRITE_NONE,
-				shooter: null
+				shooter: null,
+				type: Q.SPRITE_BULLET
 
 			});
 			this.add('2d');
@@ -212,15 +224,33 @@ window.addEventListener("load",function() {
 
 	});
 
+	Q.Sprite.extend('ShipItem', {
+		init: function(p){
+			this._super(p, {
+				x: 400,
+				y: 400,
+				type: Q.SPRITE_COLLECTABLE,
+				collisionMask: Q.SPRITE_PLAYER,
+				asset: '/images/laser.png'
+			});
+
+			this.add('2d');
+
+			this.on('hit.sprite', function(collision){
+				if(collision.obj.isA('Player'))
+				{
+					collision.obj.foundItem();
+					console.log(collision.obj.p.items);
+					this.destroy();
+				}
+			})
+		}
+	})
+
 	var player;
 	Q.scene('level1', function(stage){
 		
 		Q.stageTMX('/levels/test-level.tmx', stage);
-
-		/*
-		player = stage.insert(new Q.Player());
-		stage.add('viewport').follow(player);
-		*/
 		
 		player = Q('Player').first();
 		var previous = player;
@@ -230,6 +260,8 @@ window.addEventListener("load",function() {
 			previous = enemys[i];
 		}
 		
+		stage.insert(new Q.ShipItem());
+
 		stage.add('viewport').follow(Q('Player').first());
 
 	});
@@ -237,7 +269,7 @@ window.addEventListener("load",function() {
 	Q.loadTMX(['/images/dragon_hit1.png', 
 			'/images/laser.png', 
 			'/levels/test-level.tmx',
-			'/images/tile_map.png'
+			'/images/tiles.png'
 		], function(){
 		Q.sheet('player', '/images/dragon_hit1.png', {
 			tilew: 67.71,
