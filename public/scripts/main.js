@@ -150,7 +150,7 @@ window.addEventListener("load",function() {
 
 	//end ai stuff ===================================================
 
-	
+
 	Q.Sprite.extend('Player', {
 		init: function(p){
 			this._super(p, {
@@ -283,7 +283,7 @@ window.addEventListener("load",function() {
 				speed: 32,
 				target: this,
 				type: Q.SPRITE_ENEMY,
-				collisionMask: Q.SPRITE_NONE,
+				collisionMask: Q.SPRITE_WALL,
 				projectile: null,
 				ai: null
 			});
@@ -320,7 +320,7 @@ window.addEventListener("load",function() {
 				target: this,
 				range: 1000,
 				distance: 0,
-				collisionMask: Q.SPRITE_NONE,
+				collisionMask: Q.SPRITE_WALL | Q.SPRITE_BULLET,
 				shooter: null,
 				type: Q.SPRITE_BULLET
 
@@ -329,6 +329,10 @@ window.addEventListener("load",function() {
 
 			this.on('hit.sprite', function(collision){
 				if(collision.obj.isA('Player')){
+					if(this.p.shooter)
+						this.p.shooter.p.projectile = null;
+					this.destroy();
+				} else if(collision.obj.isA('Wall')) {
 					if(this.p.shooter)
 						this.p.shooter.p.projectile = null;
 					this.destroy();
