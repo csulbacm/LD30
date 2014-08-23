@@ -1,3 +1,90 @@
+
+//define(function (require){
+//var Ai = require('./public/scripts/ai.js');
+//var Follow = require('follow');
+//});
+
+function Ai(self) {
+	this.behaviors = new Array();
+	this.self = self;
+}
+
+Ai.prototype.add = function(behavior) {
+	var i;
+	for(i=0; i< this.behaviors.length; i++) {
+		if(behavior.type == this.behaviors[i].type 
+			&& behavior.priority >= this.behaviors[i].priority){
+
+			behaviors[i] = behavior;
+			return;
+		}
+
+	}
+	this.behaviors.push(behavior);
+}
+
+Ai.prototype.remove = function(behavior) {
+	var i;
+	for(i=0; i< this.behaviors.length; i++) {
+		if(behavior == this.behaviors[i]){
+			if(i+1 == this.behaviors.length) {
+				this.behaviors.pop();
+			} else {
+				behaviors[i] = behaviors.pop();
+			}
+			return;
+		}
+
+	}
+}
+
+Ai.prototype.step = function(dT) {
+	var i;
+	for(i=0; i< this.behaviors.length; i++) {
+		this.behaviors[i].step(dT, this);
+	}
+}
+
+function Behavior(type, priority) {
+	this.type = type;
+	this.priority = priority;
+
+}
+
+Behavior.prototype.step = function(dT, thisAi) {
+
+}
+
+function Behavior_Follow(priority, target, range) {
+	Ai.call('follow', priority);
+	this.target = target;
+	this.range = range;
+}
+
+Behavior_Follow.prototype.step = function(dT, thisAi) {
+	var selfx = thisAi.self.p.x;
+	var selfy = thisAi.self.p.y;
+	var otherx = this.target.p.x;
+	var othery = this.target.p.y;
+	var dx = otherx-selfx;
+	var dy = othery-selfy;
+	var distance = (dx*dx) + (dy*dy);
+	var range2 = this.range * this.range;
+	if(range2 < distance) {
+		var speed = thisAi.self.p.speed;
+		distance = Math.sqrt(distance);
+		if(distance > speed) {
+			dx *= speed/distance;
+			dy *= speed/distance;
+		}
+	} else {
+		dx = 0;
+		dy = 0;
+	}
+	thisAi.self.p.vx = dx;
+	thisAi.self.p.vy = dy;
+}
+
 window.addEventListener("load",function() {
 	var Q = Quintus({ development: true })
 			.include('Sprites, Scenes, Input, 2D, Anim, UI, TMX')
@@ -152,11 +239,12 @@ window.addEventListener("load",function() {
 				y: 100,
 				vx: 1,
 				vy: 1,
-				speed: 100,
+				speed: 32,
 				target: this,
 				type: Q.SPRITE_ENEMY,
 				collisionMask: Q.SPRITE_NONE,
-				projectile: null
+				projectile: null,
+				ai: null
 			});
 
 			this.add('2d, animation');
@@ -164,10 +252,13 @@ window.addEventListener("load",function() {
 		},
 
 		step: function(dt){
-			this.p.vx = this.p.vy = 0;
+			if(this.p.ai) {
+				this.p.ai.step(dt);
+			}
+			//this.p.vx = this.p.vy = 0;
 
-			this.p.vx = (this.p.target.p.x - this.p.x) / 2;
-			this.p.vy = (this.p.target.p.y - this.p.y) / 2;
+			//this.p.vx = (this.p.target.p.x - this.p.x) / 2;
+			//this.p.vy = (this.p.target.p.y - this.p.y) / 2;
 
 			//this.p.x += this.p.vx * dt;
 			//this.p.y += this.p.vy * dt;
@@ -256,7 +347,11 @@ window.addEventListener("load",function() {
 		var previous = player;
 		var enemys = [];
 		for(var i =0; i< 5; i++) {
-			enemys.push( stage.insert(new Q.Enemy({ x: 110+100*i, y: 110+100*i, target: previous, stage: stage})) );
+			var enemy = stage.insert(new Q.Enemy({ x: 110+100*i, y: 110+100*i, target: previous, speed: 100, stage: stage}));
+			var ai = new Ai(enemy);
+			ai.add(new Behavior_Follow(1, previous, 100));
+			enemy.p.ai = ai;
+			enemys.push( enemy );
 			previous = enemys[i];
 		}
 		
@@ -281,3 +376,4 @@ window.addEventListener("load",function() {
 		Q.stageScene('level1');
 	});
 });
+
