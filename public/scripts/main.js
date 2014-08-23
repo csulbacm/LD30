@@ -18,6 +18,8 @@ window.addEventListener("load",function() {
 	Q.SPRITE_COLLECTABLE = 2;
 	Q.SPRITE_ENEMY = 4;
 	Q.SPRITE_DOOR = 8;
+	Q.SPRITE_BULLET = 16;
+	Q.SPRITE_WALL = 32;
 
 	Q.Sprite.extend('Player', {
 		init: function(p){
@@ -30,32 +32,33 @@ window.addEventListener("load",function() {
 				vy: 1,
 				speed: 100,
 				animState: 0,
-				animStates: {
-					 0: 'standing',
-				 	 1: 'run_right',
-				 	 2: 'run_up',
-				 	 4: 'run_left',
-				 	 8: 'run_down',
-				 	 3: 'run_dur',
-				 	 6: 'run_dul',
-				 	 9: 'run_ddr',
-					12: 'run_ddl',
-				},
-
-				direct_right: 1,
-				direct_up: 2,
-				direct_left: 4,
-				direct_down: 8,
-				type: Q.SPRITE_PLAYER
+				type: Q.SPRITE_PLAYER,
+				health: 1
 
 			});
 
+			this.animStates = {
+				 0: 'standing',
+			 	 1: 'run_right',
+			 	 2: 'run_up',
+			 	 4: 'run_left',
+			 	 8: 'run_down',
+			 	 3: 'run_dur',
+			 	 6: 'run_dul',
+			 	 9: 'run_ddr',
+				12: 'run_ddl',
+			};
+
+			this.direct_right = 1;
+			this.direct_up = 2;
+			this.direct_left = 4;
+			this.direct_down = 8;
+
 			this.add('2d, animation');
-			this.play( this.p.animStates[this.p.animState] );
+			this.play( this.animStates[this.p.animState] );
 
 			this.on('hit.sprite', function(collision){
 				if(collision.obj.isA('Tower')){
-					//Q.stageScene('endGame', 1, { label: 'You Won' });
 					this.destroy();
 				}
 			});
@@ -71,25 +74,25 @@ window.addEventListener("load",function() {
 			this.p.animState = 0;
 			if( Q.inputs['W'] )
 			{
-				this.p.animState = this.p.animState | this.p.direct_up;
+				this.p.animState = this.p.animState | this.direct_up;
 				this.p.vy = -this.p.speed;
 			}
 			if( Q.inputs['A'] )
 			{
-				this.p.animState = this.p.animState | this.p.direct_left;
+				this.p.animState = this.p.animState | this.direct_left;
 				this.p.vx = -this.p.speed;
 			}
 			if( Q.inputs['S'] )
 			{
-				this.p.animState = this.p.animState | this.p.direct_down;
+				this.p.animState = this.p.animState | this.direct_down;
 				this.p.vy =  this.p.speed;
 			}
 			if( Q.inputs['D'] )
 			{
-				this.p.animState = this.p.animState | this.p.direct_right;
+				this.p.animState = this.p.animState | this.direct_right;
 				this.p.vx =  this.p.speed;
 			}
-			this.play( this.p.animStates[this.p.animState] );
+			this.play( this.animStates[this.p.animState] );
 
 			this.p.x += this.p.vx * dt;
 			this.p.y += this.p.vy * dt;
@@ -109,6 +112,13 @@ window.addEventListener("load",function() {
 
 		goRight: function(){
 			this.p.animState = 'run_right';
+		},
+
+		hit: function( dmg ){
+			dmg = dmg || 1;
+			this.p.health -= dmg;
+			if( this.p.health <= 0 )
+				this.destroy();
 		}
 
 	});
@@ -135,37 +145,11 @@ window.addEventListener("load",function() {
 				vx: 1,
 				vy: 1,
 				speed: 100,
-				animState: 0,
-				animStates: {
-					 0: 'standing',
-				 	 1: 'run_right',
-				 	 2: 'run_up',
-				 	 4: 'run_left',
-				 	 8: 'run_down',
-				 	 3: 'run_dur',
-				 	 6: 'run_dul',
-				 	 9: 'run_ddr',
-					12: 'run_ddl',
-				},
-
-				direct_right: 1,
-				direct_up: 2,
-				direct_left: 4,
-				direct_down: 8,
 				target: this,
 				type: Q.SPRITE_ENEMY,
-				collisionMask: Q.SPRITE_NONE
-
 			});
 			this.add('2d, animation');
-			this.play( this.p.animStates[this.p.animState] );
-
-			this.on('hit.sprite', function(collision){
-				if(collision.obj.isA('Tower')){
-					//Q.stageScene('endGame', 1, { label: 'You Won' });
-					this.destroy();
-				}
-			});
+			this.play('run_down');
 		},
 
 		step: function(dt){
@@ -178,22 +162,6 @@ window.addEventListener("load",function() {
 			this.p.x += this.p.vx * dt;
 			this.p.y += this.p.vy * dt;
 		},
-
-		goUp: function(){
-			this.p.animState = 'run_up';
-		},
-
-		goDown: function(){
-			this.p.animState = 'run_down';
-		},
-
-		goLeft: function(){
-			this.p.animState = 'run_left';
-		},
-
-		goRight: function(){
-			this.p.animState = 'run_right';
-		}
 
 	});
 
@@ -211,18 +179,18 @@ window.addEventListener("load",function() {
 
 	Q.scene('level1', function(stage){
 		var player = stage.insert(new Q.Player());
-		//var player2 = stage.insert(new Q.Follower({ x: 110, y: 110, target: player}));
-		//var followers = new Array[];
+
 		var previous = player;
 		var followers = [];
 		for(var i =0; i< 50; i++) {
 			followers.push( stage.insert(new Q.Follower({ x: 110+100*i, y: 110+100*i, target: previous})) );
 			previous = followers[i];
 		}
+		
 		stage.add('viewport').follow(player);
 	});
 
-	Q.load('/images/dragon_hit1.png', function(){
+	Q.load(['/images/dragon_hit1.png'], function(){
 		Q.sheet('player', '/images/dragon_hit1.png', {
 			tilew: 67.71,
 			tileh: 67.75,
