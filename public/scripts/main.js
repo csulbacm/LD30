@@ -1,6 +1,6 @@
 window.addEventListener("load",function() {
 	var Q = Quintus({ development: true })
-			.include('Sprites, Scenes, Input, 2D, Anim, UI')
+			.include('Sprites, Scenes, Input, 2D, Anim, UI, TMX')
 			.setup({ maximize: true });
 
 	Q.input.keyboardControls({
@@ -9,6 +9,8 @@ window.addEventListener("load",function() {
 		83: 'S',
 		68: 'D'
 	});
+	
+	// Joypads don't seem to work.
 	Q.input.joypadControls();
 
 	Q.gravityX = Q.gravityY = 0;
@@ -30,7 +32,7 @@ window.addEventListener("load",function() {
 				y: 100,
 				vx: 1,
 				vy: 1,
-				speed: 100,
+				speed: 64,
 				animState: 0,
 				type: Q.SPRITE_PLAYER,
 				health: 5
@@ -134,7 +136,8 @@ window.addEventListener("load",function() {
 		run_left: 	{ frames: [49, 50, 51, 52, 53, 54, 55], rate: 1/15 },
 		standing: 	{ frames: [28] }
 	});
-
+	/*
+	*/
 	Q.Sprite.extend('Follower', {
 		init: function(p){
 			this._super(p, {
@@ -157,19 +160,33 @@ window.addEventListener("load",function() {
 
 		step: function(dt){
 			this.p.vx = this.p.vy = 0;
-			this.p.animState = 0;
 
 			this.p.vx = (this.p.target.p.x - this.p.x) / 2;
 			this.p.vy = (this.p.target.p.y - this.p.y) / 2;
 
-			this.p.x += this.p.vx * dt;
-			this.p.y += this.p.vy * dt;
+			//this.p.x += this.p.vx * dt;
+			//this.p.y += this.p.vy * dt;
 
 			if(this.p.projectile == null) {
 				this.p.projectile = this.p.stage.insert(new Q.Laser({ x:this.p.x, y: this.p.y,vx:this.p.vx, vy:this.p.vy, shooter: this}))
 			}
 		},
 
+	});
+
+	Q.Sprite.extend('Enemy', {
+		init: function(p){
+			this._super(p, {
+				heatlh: 5,
+				x: 200,
+				y: 200,
+				asset: '/images/laser.png'
+			});
+		},
+
+		step: function(){
+
+		}
 	});
 
 	Q.Sprite.extend('Laser', {
@@ -190,7 +207,6 @@ window.addEventListener("load",function() {
 
 			this.on('hit.sprite', function(collision){
 				if(collision.obj.isA('Player')){
-					//Q.stageScene('endGame', 1, { label: 'You Won' });
 					if(this.p.shooter)
 						this.p.shooter.p.projectile = null;
 					this.destroy();
@@ -212,18 +228,31 @@ window.addEventListener("load",function() {
 
 	var player;
 	Q.scene('level1', function(stage){
+		
+		Q.stageTMX('/levels/test-level.tmx', stage);
+
+		/*
 		player = stage.insert(new Q.Player());
+		stage.add('viewport').follow(player);
+		*/
+		
+		player = Q('Player').first();
 		var previous = player;
 		var followers = [];
-		for(var i =0; i< 5; i++) {
+		for(var i =0; i< 50; i++) {
 			followers.push( stage.insert(new Q.Follower({ x: 110+100*i, y: 110+100*i, target: previous, stage: stage})) );
 			previous = followers[i];
 		}
-		var las = stage.insert(new Q.Laser());
-		stage.add('viewport').follow(player);
+		
+		stage.add('viewport').follow(Q('Player').first());
+
 	});
 
-	Q.load(['/images/dragon_hit1.png', '/images/laser.png'], function(){
+	Q.loadTMX(['/images/dragon_hit1.png', 
+			'/images/laser.png', 
+			'/levels/test-level.tmx',
+			'/images/tile_map.png'
+		], function(){
 		Q.sheet('player', '/images/dragon_hit1.png', {
 			tilew: 67.71,
 			tileh: 67.75,
