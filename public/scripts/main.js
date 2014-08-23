@@ -33,7 +33,7 @@ window.addEventListener("load",function() {
 				speed: 100,
 				animState: 0,
 				type: Q.SPRITE_PLAYER,
-				health: 1
+				health: 5
 
 			});
 
@@ -147,7 +147,9 @@ window.addEventListener("load",function() {
 				speed: 100,
 				target: this,
 				type: Q.SPRITE_ENEMY,
+				projectile: 0
 			});
+
 			this.add('2d, animation');
 			this.play('run_down');
 		},
@@ -161,20 +163,42 @@ window.addEventListener("load",function() {
 
 			this.p.x += this.p.vx * dt;
 			this.p.y += this.p.vy * dt;
+
+			if(this.p.projectile == 0) {
+				this.p.projectile = this.p.stage.insert(new Q.Laser({ x:this.p.x, y: this.p.y,vx:this.p.vx, vy:this.p.vy, shooter: this}))
+			}
 		},
 
 	});
 
-	Q.animations('player', {
-		run_right: 	{ frames: [ 0,  1,  2,  3,  4,  5,  6], rate: 1/10 },
-		run_up: 	{ frames: [ 7,  8,  9, 10, 11, 12, 13], rate: 1/10 },
-		run_dur: 	{ frames: [14, 15, 16, 17, 18, 19, 20], rate: 1/10 },
-		run_dul: 	{ frames: [21, 22, 23, 24, 25, 26, 27], rate: 1/10 },
-		run_down: 	{ frames: [28, 29, 30, 31, 32, 33, 34], rate: 1/10 },
-		run_ddr: 	{ frames: [35, 36, 37, 38, 39, 40, 41], rate: 1/10 },
-		run_ddl: 	{ frames: [42, 43, 44, 45, 46, 47, 48], rate: 1/10 },
-		run_left: 	{ frames: [49, 50, 51, 52, 53, 54, 55], rate: 1/10 },
-		standing: 	{ frames: [28] }
+	Q.Sprite.extend('Laser', {
+		init: function(p){
+			this._super(p, {
+				asset: '/images/laser.png',
+				x: 0,
+				y: 0,
+				vx: 0,
+				vy: 0,
+				speed: 100,
+				target: this,
+				shooter: 0
+
+			});
+			this.add('2d');
+
+			this.on('hit.sprite', function(collision){
+				if( collision.obj.isA('Player') ){
+					collision.obj.hit();
+					this.destroy();
+				}
+			});
+		},
+
+		step: function(dt){
+			this.p.x += this.p.vx * dt;
+			this.p.y += this.p.vy * dt;
+		}
+
 	});
 
 	Q.scene('level1', function(stage){
@@ -182,15 +206,15 @@ window.addEventListener("load",function() {
 
 		var previous = player;
 		var followers = [];
-		for(var i =0; i< 50; i++) {
-			followers.push( stage.insert(new Q.Follower({ x: 110+100*i, y: 110+100*i, target: previous})) );
+		for(var i =0; i< 5; i++) {
+			followers.push( stage.insert(new Q.Follower({ x: 110+100*i, y: 110+100*i, target: previous, stage: stage})) );
 			previous = followers[i];
 		}
-		
+		var las = stage.insert(new Q.Laser());
 		stage.add('viewport').follow(player);
 	});
 
-	Q.load(['/images/dragon_hit1.png'], function(){
+	Q.load(['/images/dragon_hit1.png', '/images/laser.png'], function(){
 		Q.sheet('player', '/images/dragon_hit1.png', {
 			tilew: 67.71,
 			tileh: 67.75,
