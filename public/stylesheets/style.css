@@ -5,13 +5,7 @@
 	width: 100%;
 }
 
-#game-canvas
+canvas
 {
-	/*
-	border-style: solid;
-	border-width: 1em;
-	*/
-	border: 0.5em ridge #003456;
-	display: block;
-	margin: 0 auto;
+	background-color: black;
 }
