@@ -33,122 +33,124 @@ window.addEventListener("load",function() {
 
 	//setup ai stuff ==============================
 	function Ai(self) {
-	this.behaviors = new Array();
-	this.self = self;
-}
-
-Ai.prototype.add = function(behavior) {
-	var i;
-	for(i=0; i< this.behaviors.length; i++) {
-		if(behavior.type == this.behaviors[i].type 
-			&& behavior.priority >= this.behaviors[i].priority){
-
-			behaviors[i] = behavior;
-			return;
-		}
-
+		this.behaviors = new Array();
+		this.self = self;
 	}
-	this.behaviors.push(behavior);
-}
 
-Ai.prototype.remove = function(behavior) {
-	var i;
-	for(i=0; i< this.behaviors.length; i++) {
-		if(behavior == this.behaviors[i]){
-			if(i+1 == this.behaviors.length) {
-				this.behaviors.pop();
-			} else {
-				behaviors[i] = behaviors.pop();
+	Ai.prototype.add = function(behavior) {
+		var i;
+		for(i=0; i< this.behaviors.length; i++) {
+			if(behavior.type == this.behaviors[i].type 
+				&& behavior.priority >= this.behaviors[i].priority){
+
+				behaviors[i] = behavior;
+				return;
 			}
-			return;
+
 		}
-
+		this.behaviors.push(behavior);
 	}
-}
 
-Ai.prototype.step = function(dT) {
-	var i;
-	for(i=0; i< this.behaviors.length; i++) {
-		this.behaviors[i].step(dT, this);
-	}
-}
+	Ai.prototype.remove = function(behavior) {
+		var i;
+		for(i=0; i< this.behaviors.length; i++) {
+			if(behavior == this.behaviors[i]){
+				if(i+1 == this.behaviors.length) {
+					this.behaviors.pop();
+				} else {
+					behaviors[i] = behaviors.pop();
+				}
+				return;
+			}
 
-function Behavior(type, priority) {
-	this.type = type;
-	this.priority = priority;
-
-}
-
-Behavior.prototype.step = function(dT, thisAi) {
-
-}
-
-function Behavior_Follow(priority, target, range) {
-	Behavior.call('follow', priority);
-	this.target = target;
-	this.range = range;
-}
-
-Behavior_Follow.prototype.step = function(dT, thisAi) {
-	var selfx = thisAi.self.p.x;
-	var selfy = thisAi.self.p.y;
-	var otherx = this.target.p.x;
-	var othery = this.target.p.y;
-	var dx = otherx-selfx;
-	var dy = othery-selfy;
-	var distance = (dx*dx) + (dy*dy);
-	var range2 = this.range * this.range;
-	if(range2 < distance) {
-		var speed = thisAi.self.p.speed;
-		distance = Math.sqrt(distance);
-		if(distance > speed) {
-			dx *= speed/distance;
-			dy *= speed/distance;
 		}
-	} else {
-		dx = 0;
-		dy = 0;
 	}
-	thisAi.self.p.vx = dx;
-	thisAi.self.p.vy = dy;
-}
 
-//shoots a laser at the next step
-//this only an action to create a laser
-function Behavior_Shoot(priority, targetx, targety, range, speed) {
-	Behavior.call('shoot', priority);
-	this.range = range;
-	this.speed = speed;
-	this.targetx = targetx;
-	this.targety = targety;
-}
-
-Behavior_Shoot.prototype.step = function(dT, thisAi) {
-	//find v
-	dx = (this.targetx-thisAi.self.p.x);
-	dy = (this.targety-thisAi.self.p.y);
-	s = Math.sqrt(dx*dx+dy*dy);
-	dx *= this.speed/s;
-	dy *= this.speed/s;
-	thisAi.self.p.stage.insert(new Q.Laser({ x:thisAi.self.p.x, y: thisAi.self.p.y,vx:dx, vy:dy, range: this.range}));
-	thisAi.remove(this);
-}
-
-function Behavior_Attack(priority, target) {
-	Behavior.call('attack', priority);
-	this.target = target;
-	this.time_elapsed = 0;
-}
-
-Behavior_Attack.prototype.step = function(dT, thisAi) {
-	this.time_elapsed += dT;
-	if(this.time_elapsed > 1) {
-		this.time_elapsed -= 1;
-		thisAi.add(new Behavior_Shoot(1, this.target.p.x, this.target.p.y, 100, 100));
+	Ai.prototype.step = function(dT) {
+		var i;
+		for(i=0; i< this.behaviors.length; i++) {
+			this.behaviors[i].step(dT, this);
+		}
 	}
-}
 
-//end ai stuff ===================================================
+	function Behavior(type, priority) {
+		this.type = type;
+		this.priority = priority;
+
+	}
+
+	Behavior.prototype.step = function(dT, thisAi) {
+
+	}
+
+	function Behavior_Follow(priority, target, range) {
+		Behavior.call('follow', priority);
+		this.target = target;
+		this.range = range;
+	}
+
+	Behavior_Follow.prototype.step = function(dT, thisAi) {
+		var selfx = thisAi.self.p.x;
+		var selfy = thisAi.self.p.y;
+		var otherx = this.target.p.x;
+		var othery = this.target.p.y;
+		var dx = otherx-selfx;
+		var dy = othery-selfy;
+		var distance = (dx*dx) + (dy*dy);
+		var range2 = this.range * this.range;
+		if(range2 < distance) {
+			var speed = thisAi.self.p.speed;
+			distance = Math.sqrt(distance);
+			if(distance > speed) {
+				dx *= speed/distance;
+				dy *= speed/distance;
+			}
+		} else {
+			dx = 0;
+			dy = 0;
+		}
+		thisAi.self.p.vx = dx;
+		thisAi.self.p.vy = dy;
+	}
+
+	//shoots a laser at the next step
+	//this only an action to create a laser
+	function Behavior_Shoot(priority, targetx, targety, range, speed) {
+		Behavior.call('shoot', priority);
+		this.range = range;
+		this.speed = speed;
+		this.targetx = targetx;
+		this.targety = targety;
+	}
+
+	Behavior_Shoot.prototype.step = function(dT, thisAi) {
+		//find v
+		dx = (this.targetx-thisAi.self.p.x);
+		dy = (this.targety-thisAi.self.p.y);
+		s = Math.sqrt(dx*dx+dy*dy);
+		dx *= this.speed/s;
+		dy *= this.speed/s;
+		thisAi.self.p.stage.insert(new Q.Laser({ x:thisAi.self.p.x, y: thisAi.self.p.y,vx:dx, vy:dy, range: this.range}));
+		thisAi.remove(this);
+	}
+
+	function Behavior_Attack(priority, target) {
+		Behavior.call('attack', priority);
+		this.target = target;
+		this.time_elapsed = 0;
+	}
+
+	Behavior_Attack.prototype.step = function(dT, thisAi) {
+		this.time_elapsed += dT;
+		if(this.time_elapsed > 1) {
+			this.time_elapsed -= 1;
+			thisAi.add(new Behavior_Shoot(1, this.target.p.x, this.target.p.y, 100, 100));
+		}
+	}
+
+	//end ai stuff ===================================================
+
+	
 	Q.Sprite.extend('Player', {
 		init: function(p){
 			this._super(p, {
@@ -161,7 +163,9 @@ Behavior_Attack.prototype.step = function(dT, thisAi) {
 				speed: 64,
 				animState: 0,
 				type: Q.SPRITE_PLAYER,
-				health: 5
+				collisionMask: Q.SPRITE_WALL | Q.SPRITE_COLLECTABLE,
+				health: 5,
+				items: 0
 
 			});
 
@@ -247,6 +251,10 @@ Behavior_Attack.prototype.step = function(dT, thisAi) {
 			this.p.health -= dmg;
 			if( this.p.health <= 0 )
 				this.destroy();
+		},
+
+		foundItem: function(){
+			this.p.items += 1;
 		}
 
 	});
@@ -263,8 +271,6 @@ Behavior_Attack.prototype.step = function(dT, thisAi) {
 		standing: 	{ frames: [28] }
 	});
 
-	/*
-	*/
 	Q.Sprite.extend('Enemy', {
 		init: function(p){
 			this._super(p, {
@@ -290,12 +296,14 @@ Behavior_Attack.prototype.step = function(dT, thisAi) {
 			if(this.p.ai) {
 				this.p.ai.step(dt);
 			}
+			// var laserData = {
+			// 	x: ( this.p.x + this.p.w + 10 ),
+			// 	y: ( this.p.y + this.p.h + 40 ),
+			// 	vx: ( this.p.vx * 1.5 ),
+			// 	vy: ( this.p.vy * 1.5 ),
+			// 	shooter: this
 
-			//if(this.p.projectile == null) {
-
-				//this.p.ai.add(new Behavior_Shoot(1, this.p.target.p.x, this.p.target.p.y, 5000, 100));
-				//this.p.projectile = this.p.stage.insert(new Q.Laser({ x:this.p.x, y: this.p.y,vx:this.p.vx, vy:this.p.vy, shooter: this}))
-			//}
+			// }
 		},
 
 	});
@@ -313,7 +321,8 @@ Behavior_Attack.prototype.step = function(dT, thisAi) {
 				range: 1000,
 				distance: 0,
 				collisionMask: Q.SPRITE_NONE,
-				shooter: null
+				shooter: null,
+				type: Q.SPRITE_BULLET
 
 			});
 			this.add('2d');
@@ -337,14 +346,33 @@ Behavior_Attack.prototype.step = function(dT, thisAi) {
 
 	});
 
+	Q.Sprite.extend('ShipItem', {
+		init: function(p){
+			this._super(p, {
+				x: 400,
+				y: 400,
+				type: Q.SPRITE_COLLECTABLE,
+				collisionMask: Q.SPRITE_PLAYER,
+				asset: '/images/laser.png'
+			});
+
+			this.add('2d');
+
+			this.on('hit.sprite', function(collision){
+				if(collision.obj.isA('Player'))
+				{
+					collision.obj.foundItem();
+					console.log(collision.obj.p.items);
+					this.destroy();
+				}
+			})
+		}
+	})
+
 	var player;
 	Q.scene('level1', function(stage){
 		
 		Q.stageTMX('/levels/test-level.tmx', stage);
-		/*
-		player = stage.insert(new Q.Player());
-		stage.add('viewport').follow(player);
-		*/
 		
 		player = Q('Player').first();
 		var previous = player;
@@ -359,6 +387,8 @@ Behavior_Attack.prototype.step = function(dT, thisAi) {
 			previous = enemys[i];
 		}
 		
+		stage.insert(new Q.ShipItem());
+
 		stage.add('viewport').follow(Q('Player').first());
 
 	});
@@ -366,7 +396,7 @@ Behavior_Attack.prototype.step = function(dT, thisAi) {
 	Q.loadTMX(['/images/dragon_hit1.png', 
 			'/images/laser.png', 
 			'/levels/test-level.tmx',
-			'/images/tile_map.png'
+			'/images/tiles.png'
 		], function(){
 		Q.sheet('player', '/images/dragon_hit1.png', {
 			tilew: 67.71,
