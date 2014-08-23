@@ -4,7 +4,35 @@
 //var Follow = require('follow');
 //});
 
-function Ai(self) {
+
+
+window.addEventListener("load",function() {
+	var Q = Quintus({ development: true })
+			.include('Sprites, Scenes, Input, 2D, Anim, UI, TMX')
+			.setup({ maximize: true });
+
+	Q.input.keyboardControls({
+		87: 'W',
+		65: 'A',
+		83: 'S',
+		68: 'D'
+	});
+	
+	// Joypads don't seem to work.
+	Q.input.joypadControls();
+
+	Q.gravityX = Q.gravityY = 0;
+
+	Q.SPRITE_NONE = 0;
+	Q.SPRITE_PLAYER = 1;
+	Q.SPRITE_COLLECTABLE = 2;
+	Q.SPRITE_ENEMY = 4;
+	Q.SPRITE_DOOR = 8;
+	Q.SPRITE_BULLET = 16;
+	Q.SPRITE_WALL = 32;
+
+	//setup ai stuff ==============================
+	function Ai(self) {
 	this.behaviors = new Array();
 	this.self = self;
 }
@@ -56,7 +84,7 @@ Behavior.prototype.step = function(dT, thisAi) {
 }
 
 function Behavior_Follow(priority, target, range) {
-	Ai.call('follow', priority);
+	Behavior.call('follow', priority);
 	this.target = target;
 	this.range = range;
 }
@@ -85,31 +113,42 @@ Behavior_Follow.prototype.step = function(dT, thisAi) {
 	thisAi.self.p.vy = dy;
 }
 
-window.addEventListener("load",function() {
-	var Q = Quintus({ development: true })
-			.include('Sprites, Scenes, Input, 2D, Anim, UI, TMX')
-			.setup({ maximize: true });
+//shoots a laser at the next step
+//this only an action to create a laser
+function Behavior_Shoot(priority, targetx, targety, range, speed) {
+	Behavior.call('shoot', priority);
+	this.range = range;
+	this.speed = speed;
+	this.targetx = targetx;
+	this.targety = targety;
+}
 
-	Q.input.keyboardControls({
-		87: 'W',
-		65: 'A',
-		83: 'S',
-		68: 'D'
-	});
-	
-	// Joypads don't seem to work.
-	Q.input.joypadControls();
+Behavior_Shoot.prototype.step = function(dT, thisAi) {
+	//find v
+	dx = (this.targetx-thisAi.self.p.x);
+	dy = (this.targety-thisAi.self.p.y);
+	s = Math.sqrt(dx*dx+dy*dy);
+	dx *= this.speed/s;
+	dy *= this.speed/s;
+	thisAi.self.p.stage.insert(new Q.Laser({ x:thisAi.self.p.x, y: thisAi.self.p.y,vx:dx, vy:dy, range: this.range}));
+	thisAi.remove(this);
+}
 
-	Q.gravityX = Q.gravityY = 0;
+function Behavior_Attack(priority, target) {
+	Behavior.call('attack', priority);
+	this.target = target;
+	this.time_elapsed = 0;
+}
 
-	Q.SPRITE_NONE = 0;
-	Q.SPRITE_PLAYER = 1;
-	Q.SPRITE_COLLECTABLE = 2;
-	Q.SPRITE_ENEMY = 4;
-	Q.SPRITE_DOOR = 8;
-	Q.SPRITE_BULLET = 16;
-	Q.SPRITE_WALL = 32;
+Behavior_Attack.prototype.step = function(dT, thisAi) {
+	this.time_elapsed += dT;
+	if(this.time_elapsed > 1) {
+		this.time_elapsed -= 1;
+		thisAi.add(new Behavior_Shoot(1, this.target.p.x, this.target.p.y, 100, 100));
+	}
+}
 
+//end ai stuff ===================================================
 	Q.Sprite.extend('Player', {
 		init: function(p){
 			this._super(p, {
@@ -251,17 +290,12 @@ window.addEventListener("load",function() {
 			if(this.p.ai) {
 				this.p.ai.step(dt);
 			}
-			//this.p.vx = this.p.vy = 0;
 
-			//this.p.vx = (this.p.target.p.x - this.p.x) / 2;
-			//this.p.vy = (this.p.target.p.y - this.p.y) / 2;
+			//if(this.p.projectile == null) {
 
-			//this.p.x += this.p.vx * dt;
-			//this.p.y += this.p.vy * dt;
-
-			if(this.p.projectile == null) {
-				this.p.projectile = this.p.stage.insert(new Q.Laser({ x:this.p.x, y: this.p.y,vx:this.p.vx, vy:this.p.vy, shooter: this}))
-			}
+				//this.p.ai.add(new Behavior_Shoot(1, this.p.target.p.x, this.p.target.p.y, 5000, 100));
+				//this.p.projectile = this.p.stage.insert(new Q.Laser({ x:this.p.x, y: this.p.y,vx:this.p.vx, vy:this.p.vy, shooter: this}))
+			//}
 		},
 
 	});
@@ -276,6 +310,8 @@ window.addEventListener("load",function() {
 				vy: 0,
 				speed: 100,
 				target: this,
+				range: 1000,
+				distance: 0,
 				collisionMask: Q.SPRITE_NONE,
 				shooter: null
 
@@ -294,11 +330,9 @@ window.addEventListener("load",function() {
 		step: function(dt){
 			this.p.x += this.p.vx * dt;
 			this.p.y += this.p.vy * dt;
-			if(Math.abs(this.p.x-player.p.x)+Math.abs(this.p.y-player.p.y) > 200){
-				if(this.p.shooter)
-					this.p.shooter.p.projectile = null;
+			this.distance += Math.sqrt(this.p.vx * dt*this.p.vx * dt + this.p.vy * dt*this.p.vy * dt);
+			if(this.distance > this.range)
 				this.destroy();
-			}
 		}
 
 	});
@@ -307,7 +341,6 @@ window.addEventListener("load",function() {
 	Q.scene('level1', function(stage){
 		
 		Q.stageTMX('/levels/test-level.tmx', stage);
-
 		/*
 		player = stage.insert(new Q.Player());
 		stage.add('viewport').follow(player);
@@ -320,6 +353,7 @@ window.addEventListener("load",function() {
 			var enemy = stage.insert(new Q.Enemy({ x: 110+100*i, y: 110+100*i, target: previous, speed: 100, stage: stage}));
 			var ai = new Ai(enemy);
 			ai.add(new Behavior_Follow(1, previous, 100));
+			ai.add(new Behavior_Attack(1, player));
 			enemy.p.ai = ai;
 			enemys.push( enemy );
 			previous = enemys[i];
