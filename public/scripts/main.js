@@ -202,7 +202,8 @@ window.addEventListener("load",function() {
 			this.p.x += this.p.vx * dt;
 			this.p.y += this.p.vy * dt;
 			if(Math.abs(this.p.x-player.p.x)+Math.abs(this.p.y-player.p.y) > 200){
-				this.p.shooter.p.projectile = null;
+				if(this.p.shooter)
+					this.p.shooter.p.projectile = null;
 				this.destroy();
 			}
 		}
