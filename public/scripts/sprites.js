@@ -5,6 +5,8 @@ Q.Sprite.extend('Player', {
 			sprite: 'player',
 			x: 100,
 			y: 100,
+			w: 64,
+			h: 64,
 			vx: 1,
 			vy: 1,
 			speed: 64,
@@ -123,8 +125,8 @@ Q.Sprite.extend('Player', {
 Q.Sprite.extend('Enemy', {
 	init: function(p){
 		this._super(p, {
-			sheet: 'player',
-			sprite: 'player',
+			sheet: 'robot',
+			sprite: 'robot',
 			x: 100,
 			y: 100,
 			vx: 1,
@@ -136,17 +138,29 @@ Q.Sprite.extend('Enemy', {
 			collisionMask: Q.SPRITE_WALL | Q.SPRITE_BULLET,
 			projectile: null,
 			ai: null,
-			sensor: true
+			sensor: true,
+			animState: {
+				 0: 'walk_left',
+				 1: 'idle',
+				 2: 'walk_right'
+			}
 		});
 
 		this.add('2d, animation');
-		this.play('run_down');
+		this.play('walk_right');
 	},
 
 	step: function(dt){
 		if(this.p.ai) {
 			this.p.ai.step(dt);
 		}
+		
+		if( this.p.vx < 0 )
+			this.play('walk_left');
+		else if( this.p.vy > 0 )
+			this.play('walk_right');
+		else if( this.p.vx == 0 )
+			this.play('idle');
 	},
 
 	hit: function( dmg ){
@@ -161,9 +175,13 @@ Q.Sprite.extend('Enemy', {
 Q.Sprite.extend('Laser', {
 	init: function(p){
 		this._super(p, {
-			asset: '/images/laser.png',
+			//asset: '/images/laser.png',
+			sheet: 'lasers',
+			sprite: 'lasers',
 			x: 0,
 			y: 0,
+			w: 26,
+			h: 48,
 			vx: 0,
 			vy: 0,
 			speed: 100,
@@ -174,9 +192,9 @@ Q.Sprite.extend('Laser', {
 			sensor: true,
 			shooter: null,
 			type: Q.SPRITE_BULLET
-
 		});
-		this.add('2d');
+		this.add('2d, animation');
+		this.play('flying');
 
 		this.on('sensor', function(collision) {
 			if(collision.obj){
@@ -272,7 +290,6 @@ Q.Sprite.extend('Spawner', {
 			this.spawnUnit();
 			this.timeCounter = 0;
 		}
-
 	},
 
 	spawnUnit: function(){
@@ -284,8 +301,5 @@ Q.Sprite.extend('Spawner', {
 		ai.add(new Behavior_Attack(1, Q('Player').first()));
 		enemy.p.ai = ai;
 		this.stage.insert(enemy);
-
-		console.log('Spawning');
-		console.log( this.p );
 	}
 });

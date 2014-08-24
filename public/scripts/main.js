@@ -65,14 +65,17 @@ Q.loadTMX(['/images/dragon_hit1.png',
 		'/levels/test-level.tmx',
 		'/levels/test-level2.tmx',
 		'/images/tiles.png',
-		'/images/portals.png'
+		'/images/portals.png',
+		'/images/robots.png',
+		'/images/lasers.png'
+
 	], function(){
 	
 	Q.sheet('player', '/images/dragon_hit1.png', {
 		tilew: 67.71,
 		tileh: 67.75,
-		sx: 	   0,
-		sy: 	   0
+		sx: 0,
+		sy: 0
 	});
 
 	Q.sheet('portal', '/images/portals.png', {
@@ -80,6 +83,20 @@ Q.loadTMX(['/images/dragon_hit1.png',
 		tileh:  145,
 		sx: 	0,
 		sy: 	0,
+	});
+
+	Q.sheet('robot', '/images/robots.png', {
+		tilew: 61,
+		tileh: 75,
+		sx: 0,
+		sy: 0,
+	});
+
+	Q.sheet('lasers', '/images/lasers.png', {
+		tilew: 64,
+		tileh: 48,
+		sx: 0,
+		sy: 8,
 	});
 
 	Q.stageScene('level1');
