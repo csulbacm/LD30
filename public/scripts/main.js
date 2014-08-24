@@ -362,7 +362,7 @@ window.addEventListener("load",function() {
 	function Behavior_Follow(priority, target, range) {
 		Behavior.call('follow', priority);
 		this.target = target;
-		this.range = range;
+		this.range = range || 100;
 	}
 
 	Behavior_Follow.prototype.step = function(dT, thisAi) {
@@ -416,13 +416,23 @@ window.addEventListener("load",function() {
 		Behavior.call('attack', priority);
 		this.target = target;
 		this.time_elapsed = 0;
+		this.state = 0;
 	}
 
 	Behavior_Attack.prototype.step = function(dT, thisAi) {
 		this.time_elapsed += dT;
-		if(this.time_elapsed > 1) {
-			this.time_elapsed -= 1;
-			thisAi.add(new Behavior_Shoot(1, this.target.p.x, this.target.p.y, 100, 100));
+		if(this.state < 3) {
+			if(this.time_elapsed > 0.7) {
+				this.time_elapsed = 0;
+				thisAi.add(new Behavior_Shoot(1, this.target.p.x, this.target.p.y, 100, 100));
+				this.state++;
+			}
+		} else if(this.state == 3) {
+			if(this.time_elapsed > 2) {
+				this.time_elapsed = 0;
+				thisAi.add(new Behavior_Shoot(1, this.target.p.x, this.target.p.y, 100, 100));
+				this.state=0;
+			}
 		}
 	}
 
