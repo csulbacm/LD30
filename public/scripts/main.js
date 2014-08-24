@@ -16,7 +16,6 @@ Q.input.keyboardControls({
 
 Q.input.touchControls();
 Q.input.mouseControls({ cursor: 'on' });
-
 // Joypads don't seem to work.
 // Q.input.joypadControls();
 
@@ -59,12 +58,48 @@ Q.scene('level1', function(stage){
     stage.insert(new Q.ShipItem());
 
     stage.add('viewport').follow(Q('Player').first());
+    Q.stageScene('hud', 1, { health: Q('Player').first().p.health, portals: Q('Spawner').length });
+});
 
+Q.scene('hud', function(stage){
+
+	var containerLeft = stage.insert(new Q.UI.Container({
+		fill: 'black',
+		border: 5,
+		shadow: 10,
+		shadowColor: 'rgb(0,0,0,5)',
+		x: 120,
+		y: 50
+	}));
+
+	containerLeft.insert(new Q.UI.Text({
+    	label: 'Health: ' + stage.options.health,
+    	color: 'green'
+    }));
+
+	width = document.getElementsByTagName('canvas')[0].width;
+	var containerRight = stage.insert(new Q.UI.Container({
+		fill: 'black',
+		border: 5,
+		shadow: 10,
+		shadowColor: 'rgb(0,0,0,5)',
+		x:  (width - 140),
+		y: 50
+	}));
+
+	containerRight.insert( new Q.UI.Text({
+		label: 'Portals: ' + stage.options.portals,
+		color: 'green'
+	}));
+
+    containerLeft.fit(20,20);
+    containerRight.fit(20,20);
 });
 
 Q.scene('level2', function(stage){
     Q.stageTMX('/levels/test-level2.tmx', stage);
     stage.add('viewport').follow(Q('Player').first());
+    Q.stageScene('hud', 1, { health: Q('Player').first().p.health, portals: Q('Spawner').length });
 })
 
 Q.loadTMX(['/images/dragon_hit1.png', 

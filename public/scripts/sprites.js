@@ -70,7 +70,8 @@ Q.Sprite.extend('Player', {
 		if( this.portalTouching )
 		{
 			this.portalTouching.closePortal();
-			console.log('Portals Left: ' + Q('Spawner').length);
+			Q.clearStage(1);
+			Q.stageScene('hud', 1, { health: this.p.health, portals: (Q('Spawner').length-1) });
 		}
 	},
 
@@ -130,6 +131,8 @@ Q.Sprite.extend('Player', {
 	hit: function( dmg ){
 		dmg = dmg || 1;
 		this.p.health -= dmg;
+		Q.clearStage(1);
+		Q.stageScene('hud', 1, { health: this.p.health, portals: Q('Spawner').length });
 		if( this.p.health <= 0 )
 			this.kill();
 	},
@@ -235,7 +238,6 @@ Q.Sprite.extend('Laser', {
 	collisionCheck: function(collision){
 		if( collision.obj ){
 			if(collision.obj.isA('Player') || collision.obj.isA('Enemy')){
-				console.log( this );
 				if(collision.obj != this.p.shooter && collision.obj.p.type != this.p.shooter.p.type){
 					collision.obj.hit( 1 );
 					this.destroy();
