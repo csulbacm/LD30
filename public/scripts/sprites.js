@@ -140,7 +140,7 @@ Q.Sprite.extend('Player', {
 	kill: function(){
 		this.stage.unfollow( this );
 		this.destroy();
-		Q.stageScene( Q.GameState.level );
+		Q.stageScene('GameOver',2)
 	},
 
 	foundItem: function(){

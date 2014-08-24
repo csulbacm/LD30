@@ -77,13 +77,12 @@ Q.scene('hud', function(stage){
     	color: 'green'
     }));
 
-	width = document.getElementsByTagName('canvas')[0].width;
 	var containerRight = stage.insert(new Q.UI.Container({
 		fill: 'black',
 		border: 5,
 		shadow: 10,
 		shadowColor: 'rgb(0,0,0,5)',
-		x:  (width - 140),
+		x:  (Q.width - 140),
 		y: 50
 	}));
 
@@ -100,7 +99,38 @@ Q.scene('level2', function(stage){
     Q.stageTMX('/levels/test-level2.tmx', stage);
     stage.add('viewport').follow(Q('Player').first());
     Q.stageScene('hud', 1, { health: Q('Player').first().p.health, portals: Q('Spawner').length });
-})
+});
+
+Q.scene('GameOver', function(stage){
+	Q.stage(0).pause();
+	var container = stage.insert(new Q.UI.Container({
+		fill: 'white',
+		border: 5,
+		shadow: 10,
+		shadowColor: 'rgb(0,0,0,5)',
+		x: Q.width/2,
+		y: Q.height/2
+	}));
+
+	var button = container.insert(new Q.UI.Button({
+		label: 'Continue?',
+		x: 0,
+		y: 0,
+		border: 5,
+		fill: '#CCCCCC'
+	}, function(){
+		Q.clearStages();
+		Q.stageScene( Q.GameState.level );
+	}));
+
+	container.insert(new Q.UI.Text({
+		label: 'Game Over',
+		x: 0,
+		y: -10 - button.p.h
+	}));
+
+	container.fit(20);
+});
 
 Q.loadTMX(['/images/dragon_hit1.png', 
         '/images/laser.png', 
