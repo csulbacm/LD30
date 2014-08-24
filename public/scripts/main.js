@@ -130,7 +130,7 @@ window.addEventListener("load",function() {
 		s = Math.sqrt(dx*dx+dy*dy);
 		dx *= this.speed/s;
 		dy *= this.speed/s;
-		thisAi.self.p.stage.insert(new Q.Laser({ x:thisAi.self.p.x, y: thisAi.self.p.y,vx:dx, vy:dy, range: this.range}));
+		thisAi.self.stage.insert(new Q.Laser({ x:thisAi.self.p.x, y: thisAi.self.p.y,vx:dx, vy:dy, range: this.range}));
 		thisAi.remove(this);
 	}
 
@@ -320,7 +320,7 @@ window.addEventListener("load",function() {
 				target: this,
 				range: 1000,
 				distance: 0,
-				collisionMask: Q.SPRITE_WALL | Q.SPRITE_BULLET | Q.SPRITE_PLAYER,
+				collisionMask: Q.SPRITE_WALL | Q.SPRITE_PLAYER,
 				shooter: null,
 				type: Q.SPRITE_BULLET
 
@@ -373,6 +373,37 @@ window.addEventListener("load",function() {
 		}
 	})
 
+	Q.Sprite.extend('Spawner', {
+		init: function(p){
+			this._super(p, {
+				type: Q.SPRITE_NONE,
+				collisionMask: Q.SPRITE_NONE,
+
+
+			});
+
+			this.timeCounter = 0;
+		},
+
+		step: function(dt){
+			this.timeCounter += dt;
+			if( this.timeCounter >= 5 ){
+				this.spawnUnit();
+				this.timeCounter = 0;
+			}
+
+		},
+
+		spawnUnit: function(){
+			var enemy = new Q.Enemy({ x: this.p.x, y: this.p.y });
+			var ai = new Ai(enemy);
+			ai.add(new Behavior_Follow(1, Q('Player').first(), 100));
+			ai.add(new Behavior_Attack(1, Q('Player').first()));
+			enemy.p.ai = ai;
+			this.stage.insert(enemy);
+		}
+	});
+
 	var player;
 	Q.scene('level1', function(stage){
 		
@@ -382,7 +413,7 @@ window.addEventListener("load",function() {
 		var previous = player;
 		var enemys = [];
 		for(var i =0; i< 5; i++) {
-			var enemy = stage.insert(new Q.Enemy({ x: 110+100*i, y: 110+100*i, target: previous, speed: 100, stage: stage}));
+			var enemy = stage.insert(new Q.Enemy({ x: 110+100*i, y: 110+100*i, target: previous, speed: 100 }));
 			var ai = new Ai(enemy);
 			ai.add(new Behavior_Follow(1, previous, 100));
 			ai.add(new Behavior_Attack(1, player));
@@ -392,6 +423,7 @@ window.addEventListener("load",function() {
 		}
 		
 		stage.insert(new Q.ShipItem());
+		stage.insert(new Q.Spawner({ x: 600, y: 600 }));
 
 		stage.add('viewport').follow(Q('Player').first());
 
@@ -412,4 +444,3 @@ window.addEventListener("load",function() {
 		Q.stageScene('level1');
 	});
 });
-
