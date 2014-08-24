@@ -11,8 +11,9 @@ Q.Sprite.extend('Player', {
 			animState: 0,
 			type: Q.SPRITE_PLAYER,
 			collisionMask: Q.SPRITE_WALL | Q.SPRITE_COLLECTABLE | Q.SPRITE_BULLET,
-			health: 5,
-			items: 0
+			health: 10,
+			items: 0,
+			sensor: true
 
 		});
 
@@ -96,8 +97,8 @@ Q.Sprite.extend('Player', {
 	hit: function( dmg ){
 		dmg = dmg || 1;
 		this.p.health -= dmg;
-		if( this.p.health <= 0 )
-			this.destroy();
+		//if( this.p.health <= 0 )
+		//	this.destroy();
 	},
 
 	foundItem: function(){
@@ -112,7 +113,7 @@ Q.Sprite.extend('Player', {
 		dx = Math.cos(angle*Math.PI/180)*this.p.speed;
 		dy = Math.sin(angle*Math.PI/180)*this.p.speed;
 
-		var laser = new Q.Laser({ x: this.p.x, y: this.p.y,vx:dx, vy:dy, angle: angle+90});
+		var laser = new Q.Laser({ x: this.p.x, y: this.p.y,vx:dx, vy:dy, angle: angle+90, shooter: this});
 		this.stage.insert(laser);
 	}
 
@@ -128,11 +129,13 @@ Q.Sprite.extend('Enemy', {
 			vx: 1,
 			vy: 1,
 			speed: 32,
+			health: 2,
 			target: this,
 			type: Q.SPRITE_ENEMY,
-			collisionMask: Q.SPRITE_WALL,
+			collisionMask: Q.SPRITE_WALL | Q.SPRITE_BULLET,
 			projectile: null,
-			ai: null
+			ai: null,
+			sensor: true
 		});
 
 		this.add('2d, animation');
@@ -143,15 +146,14 @@ Q.Sprite.extend('Enemy', {
 		if(this.p.ai) {
 			this.p.ai.step(dt);
 		}
-		// var laserData = {
-		// 	x: ( this.p.x + this.p.w + 10 ),
-		// 	y: ( this.p.y + this.p.h + 40 ),
-		// 	vx: ( this.p.vx * 1.5 ),
-		// 	vy: ( this.p.vy * 1.5 ),
-		// 	shooter: this
-
-		// }
 	},
+
+	hit: function( dmg ){
+		dmg = dmg || 1;
+		this.p.health -= dmg;
+		if( this.p.health <= 0 )
+			this.destroy();
+	}
 
 });
 
@@ -167,19 +169,39 @@ Q.Sprite.extend('Laser', {
 			target: this,
 			range: 1000,
 			distance: 0,
-			collisionMask: Q.SPRITE_WALL | Q.SPRITE_PLAYER,
+			collisionMask: Q.SPRITE_WALL | Q.SPRITE_PLAYER | Q.SPRITE_ENEMY,
+			sensor: true,
 			shooter: null,
 			type: Q.SPRITE_BULLET
 
 		});
 		this.add('2d');
 
+		this.on('sensor', function(collision) {
+			if(collision.obj){
+				if(collision.obj.isA('Player') || collision.obj.isA('Enemy')){
+					if(collision.obj != this.p.shooter){
+						collision.obj.p.hit( 1 );
+						this.destroy();
+					}
+				}
+				else if( collision.obj.p.type == Q.SPRITE_WALL ){
+					if(this.p.shooter)
+						this.p.shooter.p.projectile = null;
+					this.destroy();
+				}
+
+			}
+		});
+		
 		this.on('hit', function(collision){
-			if(collision.obj.isA('Player')){
-				if(this.p.shooter)
-					this.p.shooter.p.projectile = null;
-				this.destroy();
-			} else if( collision.obj.p.type == Q.SPRITE_WALL ){
+			if(collision.obj.isA('Player') || collision.obj.isA('Enemy')){
+				if(collision.obj != this.p.shooter){
+					collision.obj.hit( 1 );
+					this.destroy();
+				}
+			}
+			else if( collision.obj.p.type == Q.SPRITE_WALL ){
 				if(this.p.shooter)
 					this.p.shooter.p.projectile = null;
 				this.destroy();

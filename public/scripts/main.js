@@ -29,6 +29,7 @@ Q.SPRITE_DOOR = 8;
 Q.SPRITE_BULLET = 16;
 Q.SPRITE_WALL = 32;
 
+
 Q.el.addEventListener('mousedown', function(){
 	var player = Q('Player').first();
 	if( player )
