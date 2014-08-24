@@ -29,6 +29,11 @@ Q.SPRITE_DOOR = 8;
 Q.SPRITE_BULLET = 16;
 Q.SPRITE_WALL = 32;
 
+Q.levels = [
+	'level1',
+	'level2'
+];
+
 
 Q.el.addEventListener('mousedown', function(){
     var player = Q('Player').first();
@@ -120,7 +125,8 @@ Q.scene('GameOver', function(stage){
 		fill: '#CCCCCC'
 	}, function(){
 		Q.clearStages();
-		Q.stageScene( Q.GameState.level );
+		Q.GameState.level = 0;
+		Q.stageScene( Q.levels[ Q.GameState.level ] );
 	}));
 
 	container.insert(new Q.UI.Text({
@@ -131,6 +137,57 @@ Q.scene('GameOver', function(stage){
 
 	container.fit(20);
 });
+
+Q.scene('NextLevel', function(stage){
+	Q.stage(0).pause();
+	var container = stage.insert(new Q.UI.Container({
+		fill: 'white',
+		border: 5,
+		shadow: 10,
+		shadowColor: 'rgb(0,0,0,5)',
+		x: Q.width/2,
+		y: Q.height/2
+	}));
+
+	var button = container.insert(new Q.UI.Button({
+		label: 'Continue',
+		x: 0,
+		y: 0,
+		border: 5,
+		fill: '#CCCCCC'
+	}, function(){
+		Q.clearStages();
+		
+		if( stage.options.levelOffset )
+			Q.GameState.level += stage.options.levelOffset;
+		else
+			Q.GameState.level += 1;
+
+		if( Q.GameState.level >= Q.levels.length )
+			Q.GameState.level = Q.levels.length - 1;
+		Q.stageScene( Q.levels[ Q.GameState.level ] );
+	}));
+
+	var button2 = container.insert(new Q.UI.Button({
+		label: 'Restart',
+		x: 0,
+		y: 10 + button.p.h,
+		border: 5,
+		fill: '#CCCCCC'
+	}, function(){
+		Q.clearStages();
+		Q.GameState.level = 0;
+		Q.stageScene( Q.levels[ Q.GameState.level ] );
+	}));
+
+	container.insert(new Q.UI.Text({
+		label: 'Continue to Next Level?',
+		x: 0,
+		y: -10 - button.p.h - button2.p.h
+	}));
+
+	container.fit(20);
+})
 
 Q.loadTMX(['/images/dragon_hit1.png', 
         '/images/laser.png', 
@@ -171,5 +228,5 @@ Q.loadTMX(['/images/dragon_hit1.png',
     });
 
     Q.stageScene('level2');
-    Q.GameState.level = 'level1';
+    Q.GameState.level = 0;
 });

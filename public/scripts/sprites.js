@@ -71,7 +71,14 @@ Q.Sprite.extend('Player', {
 		{
 			this.portalTouching.closePortal();
 			Q.clearStage(1);
-			Q.stageScene('hud', 1, { health: this.p.health, portals: (Q('Spawner').length-1) });
+
+			var portalsLeft = ( Q('Spawner').length - 1 );
+			Q.stageScene('hud', 1, { health: this.p.health, portals: portalsLeft });
+
+			if( portalsLeft <= 0 ){
+				//Q.GameState.level = 'level' + (parseInt( Q.GameState.level.slice(5) ) + 1);
+				Q.stageScene('NextLevel',2, { levelOffset: 1 });
+			}
 		}
 	},
 
