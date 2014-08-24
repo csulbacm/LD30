@@ -9,17 +9,18 @@
 window.addEventListener("load",function() {
 	var Q = Quintus({ development: true })
 			.include('Sprites, Scenes, Input, 2D, Anim, UI, TMX')
-			.setup({ maximize: true });
+			.setup({ maximize: true })
+			.controls(true);
 
 	Q.input.keyboardControls({
-		87: 'W',
-		65: 'A',
-		83: 'S',
-		68: 'D'
+		87: 'up',	// W
+		65: 'left',	// A
+		83: 'down',	// S
+		68: 'right'	// D
 	});
 	
 	// Joypads don't seem to work.
-	Q.input.joypadControls();
+	// Q.input.joypadControls();
 
 	Q.gravityX = Q.gravityY = 0;
 
@@ -76,31 +77,31 @@ window.addEventListener("load",function() {
 				}
 			});
 
-			Q.input.on('W', this, 'goUp');
-			Q.input.on('A', this, 'goLeft');
-			Q.input.on('S', this, 'goDown');
-			Q.input.on('D', this, 'goRight');
+			Q.input.on('up', this, 'goUp');
+			Q.input.on('left', this, 'goLeft');
+			Q.input.on('down', this, 'goDown');
+			Q.input.on('right', this, 'goRight');
 		},
 
 		step: function(dt){
 			this.p.vx = this.p.vy = 0;
 			this.p.animState = 0;
-			if( Q.inputs['W'] )
+			if( Q.inputs['up'] )
 			{
 				this.p.animState = this.p.animState | this.direct_up;
 				this.p.vy = -this.p.speed;
 			}
-			if( Q.inputs['A'] )
+			if( Q.inputs['left'] )
 			{
 				this.p.animState = this.p.animState | this.direct_left;
 				this.p.vx = -this.p.speed;
 			}
-			if( Q.inputs['S'] )
+			if( Q.inputs['down'] )
 			{
 				this.p.animState = this.p.animState | this.direct_down;
 				this.p.vy =  this.p.speed;
 			}
-			if( Q.inputs['D'] )
+			if( Q.inputs['right'] )
 			{
 				this.p.animState = this.p.animState | this.direct_right;
 				this.p.vx =  this.p.speed;
