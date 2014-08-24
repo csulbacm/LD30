@@ -11,7 +11,7 @@ Q.Sprite.extend('Player', {
 			animState: 0,
 			type: Q.SPRITE_PLAYER,
 			collisionMask: Q.SPRITE_WALL | Q.SPRITE_COLLECTABLE | Q.SPRITE_BULLET,
-			health: 5,
+			health: 10,
 			items: 0,
 			sensor: true
 
@@ -76,6 +76,7 @@ Q.Sprite.extend('Player', {
 
 		this.p.x += this.p.vx * dt;
 		this.p.y += this.p.vy * dt;
+		this.shoot();
 	},
 
 	goUp: function(){
@@ -97,8 +98,8 @@ Q.Sprite.extend('Player', {
 	hit: function( dmg ){
 		dmg = dmg || 1;
 		this.p.health -= dmg;
-		if( this.p.health <= 0 )
-			this.destroy();
+		//if( this.p.health <= 0 )
+		//	this.destroy();
 	},
 
 	foundItem: function(){
@@ -129,7 +130,7 @@ Q.Sprite.extend('Enemy', {
 			vx: 1,
 			vy: 1,
 			speed: 32,
-			health: 100,
+			health: 2,
 			target: this,
 			type: Q.SPRITE_ENEMY,
 			collisionMask: Q.SPRITE_WALL | Q.SPRITE_BULLET,
@@ -146,18 +147,14 @@ Q.Sprite.extend('Enemy', {
 		if(this.p.ai) {
 			this.p.ai.step(dt);
 		}
-		if(this.p.health < 100) {
-			this.destroy();
-		}
-		// var laserData = {
-		// 	x: ( this.p.x + this.p.w + 10 ),
-		// 	y: ( this.p.y + this.p.h + 40 ),
-		// 	vx: ( this.p.vx * 1.5 ),
-		// 	vy: ( this.p.vy * 1.5 ),
-		// 	shooter: this
-
-		// }
 	},
+
+	hit: function( dmg ){
+		dmg = dmg || 1;
+		this.p.health -= dmg;
+		if( this.p.health <= 0 )
+			this.destroy();
+	}
 
 });
 
@@ -183,32 +180,29 @@ Q.Sprite.extend('Laser', {
 
 		this.on('sensor', function(collision) {
 			if(collision.obj){
-				if(collision.obj.isA('Player')){
-					if(collision.obj != this.p.shooter)
-						this.destroy();
-				} else if( collision.obj.isA('Enemy')){
-					if(this.p.shooter != collision.obj) {
-						collision.obj.p.health -= 50;
+				if(collision.obj.isA('Player') || collision.obj.isA('Enemy')){
+					if(collision.obj != this.p.shooter){
+						collision.obj.p.hit( 1 );
 						this.destroy();
 					}
-				} else if( collision.obj.p.type == Q.SPRITE_WALL ){
+				}
+				else if( collision.obj.p.type == Q.SPRITE_WALL ){
 					if(this.p.shooter)
 						this.p.shooter.p.projectile = null;
 					this.destroy();
 				}
+
 			}
 		});
 		
 		this.on('hit', function(collision){
-			if(collision.obj.isA('Player')){
-				if(collision.obj != this.p.shooter)
-						this.destroy();
-			} else if( collision.obj.isA('Enemy')){
-				if(this.p.shooter != collision.obj) {
-					collision.obj.p.health -= 50;
+			if(collision.obj.isA('Player') || collision.obj.isA('Enemy')){
+				if(collision.obj != this.p.shooter){
+					collision.obj.hit( 1 );
 					this.destroy();
 				}
-			} else if( collision.obj.p.type == Q.SPRITE_WALL ){
+			}
+			else if( collision.obj.p.type == Q.SPRITE_WALL ){
 				if(this.p.shooter)
 					this.p.shooter.p.projectile = null;
 				this.destroy();
@@ -256,12 +250,16 @@ Q.Sprite.extend('ShipItem', {
 Q.Sprite.extend('Spawner', {
 	init: function(p){
 		this._super(p, {
+			sheet:  'portal',
+			sprite: 'portal',
 			type: Q.SPRITE_NONE,
 			collisionMask: Q.SPRITE_NONE,
 			asset: '/images/laser.png'
 
 		});
 
+		this.add('2d, animation');
+		this.play('idle')
 		this.timeCounter = 0;
 		this.on('mouseup', function(){
 			console.log('mousedown event');

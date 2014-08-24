@@ -12,6 +12,11 @@
     <property name="Class" value="Player"/>
    </properties>
   </tile>
+  <tile id="51">
+   <properties>
+    <property name="Class" value="Spawner"/>
+   </properties>
+  </tile>
  </tileset>
  <layer name="Floor Layer" width="25" height="25">
   <properties>
@@ -1280,5 +1285,8 @@
  </layer>
  <objectgroup name="Object Layer 1" width="25" height="25">
   <object gid="51" x="1371" y="208"/>
+  <object gid="52" x="369" y="433"/>
+  <object gid="52" x="1416" y="1467"/>
+  <object gid="52" x="847" y="1281"/>
  </objectgroup>
 </map>

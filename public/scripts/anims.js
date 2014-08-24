@@ -10,8 +10,8 @@ Q.animations('player', {
 	standing: 	{ frames: [28] }
 });
 
-/*
 Q.animations('portal', {
-
-})
+	idle: 		{ frames: [4,5,6], rate: 1/4 }
+});
+/*
 */
