@@ -39,8 +39,9 @@ Q.el.addEventListener('mousedown', function(){
 
 Q.scene('level1', function(stage){
     
-    Q.stageTMX('/levels/test-level2.tmx', stage);
+    Q.stageTMX('/levels/test-level.tmx', stage);
     
+    /*
     var player = Q('Player').first();
     var previous = player;
     var enemys = [];
@@ -54,12 +55,17 @@ Q.scene('level1', function(stage){
         enemys.push( enemy );
         previous = enemys[i];
     }
-
+    */
     stage.insert(new Q.ShipItem());
 
     stage.add('viewport').follow(Q('Player').first());
 
 });
+
+Q.scene('level2', function(stage){
+    Q.stageTMX('/levels/test-level2.tmx', stage);
+    stage.add('viewport').follow(Q('Player').first());
+})
 
 Q.loadTMX(['/images/dragon_hit1.png', 
         '/images/laser.png', 
@@ -99,5 +105,6 @@ Q.loadTMX(['/images/dragon_hit1.png',
         sy: 8,
     });
 
-    Q.stageScene('level1');
+    Q.stageScene('level2');
+    Q.GameState.level = 'level1';
 });

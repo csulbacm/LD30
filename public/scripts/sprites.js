@@ -130,8 +130,14 @@ Q.Sprite.extend('Player', {
 	hit: function( dmg ){
 		dmg = dmg || 1;
 		this.p.health -= dmg;
-		//if( this.p.health <= 0 )
-		//	this.destroy();
+		if( this.p.health <= 0 )
+			this.kill();
+	},
+
+	kill: function(){
+		this.stage.unfollow( this );
+		this.destroy();
+		Q.stageScene( Q.GameState.level );
 	},
 
 	foundItem: function(){
@@ -164,7 +170,7 @@ Q.Sprite.extend('Enemy', {
 			speed: 32,
 			health: 2,
 			target: this,
-			type: Q.SPRITE_WALL | Q.SPRITE_ENEMY,
+			type: Q.SPRITE_ENEMY,
 			collisionMask: Q.SPRITE_WALL | Q.SPRITE_BULLET,
 			projectile: null,
 			ai: null,
@@ -182,7 +188,7 @@ Q.Sprite.extend('Enemy', {
 			if( this.p.vx < 0 )
 				this.play('walk_left');
 			else if( this.p.vx > 0 )
-				// TODO: Fix this by getting Suzie to flip sprites on sheet. Quintus flipping seems to be janky.
+				// TODO: Fix this by getting Suzy to flip sprites on sheet. Quintus flipping seems to be janky.
 				this.play('walk_right');
 			else
 				this.play('idle');
@@ -202,7 +208,6 @@ Q.Sprite.extend('Enemy', {
 Q.Sprite.extend('Laser', {
 	init: function(p){
 		this._super(p, {
-			//asset: '/images/laser.png',
 			sheet: 'lasers',
 			sprite: 'lasers',
 			x: 0,
@@ -215,34 +220,23 @@ Q.Sprite.extend('Laser', {
 			target: this,
 			range: 1000,
 			distance: 0,
+			type: Q.SPRITE_BULLET,
 			collisionMask: Q.SPRITE_WALL | Q.SPRITE_PLAYER | Q.SPRITE_ENEMY,
 			sensor: true,
 			shooter: null,
-			type: Q.SPRITE_BULLET
 		});
 		this.add('2d, animation');
 		this.play('flying');
 
-		this.on('sensor', function(collision) {
-			if(collision.obj){
-				if(collision.obj.isA('Player') || collision.obj.isA('Enemy')){
-					if(collision.obj != this.p.shooter){
-						collision.obj.p.hit( 1 );
-						this.destroy();
-					}
-				}
-				else if( collision.obj.p.type == Q.SPRITE_WALL ){
-					if(this.p.shooter)
-						this.p.shooter.p.projectile = null;
-					this.destroy();
-				}
+		this.on('sensor', this.collisionCheck);
+		this.on('hit', this.collisionCheck);
+	},
 
-			}
-		});
-		
-		this.on('hit', function(collision){
+	collisionCheck: function(collision){
+		if( collision.obj ){
 			if(collision.obj.isA('Player') || collision.obj.isA('Enemy')){
-				if(collision.obj != this.p.shooter){
+				console.log( this );
+				if(collision.obj != this.p.shooter && collision.obj.p.type != this.p.shooter.p.type){
 					collision.obj.hit( 1 );
 					this.destroy();
 				}
@@ -252,7 +246,7 @@ Q.Sprite.extend('Laser', {
 					this.p.shooter.p.projectile = null;
 				this.destroy();
 			}
-		});
+		}
 	},
 
 	step: function(dt){
@@ -306,7 +300,7 @@ Q.Sprite.extend('Spawner', {
 
 	step: function(dt){
 		this.timeCounter += dt;
-		if( this.timeCounter >= 10 ){
+		if( this.timeCounter >= 2.5 ){
 			this.spawnUnit();
 			this.timeCounter = 0;
 		}
