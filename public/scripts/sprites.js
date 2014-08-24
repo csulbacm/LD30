@@ -77,7 +77,7 @@ Q.Sprite.extend('Player', {
 
 			if( portalsLeft <= 0 ){
 				//Q.GameState.level = 'level' + (parseInt( Q.GameState.level.slice(5) ) + 1);
-				Q.stageScene('NextLevel',2, { levelOffset: 1 });
+				Q.stageScene('NextLevel',2);
 			}
 		}
 	},
@@ -185,6 +185,7 @@ Q.Sprite.extend('Enemy', {
 			projectile: null,
 			ai: null,
 			sensor: true,
+			spawner: null
 		});
 
 		this.add('2d, animation');
@@ -209,8 +210,11 @@ Q.Sprite.extend('Enemy', {
 	hit: function( dmg ){
 		dmg = dmg || 1;
 		this.p.health -= dmg;
-		if( this.p.health <= 0 )
+		if( this.p.health <= 0 ){
+			if( this.p.spawner )
+				this.p.spawner.p.spawned -= 1;
 			this.destroy();
+		}
 	}
 
 });
@@ -299,7 +303,9 @@ Q.Sprite.extend('Spawner', {
 			collision: false,
 			asset: '/images/laser.png',
 			dead: false,
-			startDeadTimer: 0
+			startDeadTimer: 0,
+			spawned: 0,
+			spawnLimit: 5
 		});
 
 		this.add('2d, animation');
@@ -323,12 +329,17 @@ Q.Sprite.extend('Spawner', {
 	},
 
 	spawnUnit: function(){
-		var enemy = new Q.Enemy({ x: this.p.x, y: this.p.y });
-		var ai = new Ai(enemy);
-		ai.add(new Behavior_Follow(1, Q('Player').first(), 100));
-		ai.add(new Behavior_Attack(1, Q('Player').first()));
-		enemy.p.ai = ai;
-		this.stage.insert(enemy);
+		if( this.p.spawned < this.p.spawnLimit )
+		{
+			var enemy = new Q.Enemy({ x: this.p.x, y: this.p.y, spawner: this });
+			var ai = new Ai(enemy);
+			ai.add(new Behavior_Follow(1, Q('Player').first(), 100));
+			ai.add(new Behavior_Attack(1, Q('Player').first()));
+			enemy.p.ai = ai;
+			this.stage.insert(enemy);
+
+			this.p.spawned += 1;
+		}
 	},
 
 	closePortal: function(){
