@@ -1286,5 +1286,6 @@
   <object gid="47" x="1344" y="192"/>
   <object gid="47" x="1344" y="832"/>
   <object gid="47" x="192" y="832"/>
+  <object gid="47" x="1344" y="384"/>
  </objectgroup>
 </map>
