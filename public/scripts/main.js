@@ -263,7 +263,7 @@ window.addEventListener("load",function() {
 			this._super(p, {
 				type: Q.SPRITE_NONE,
 				collisionMask: Q.SPRITE_NONE,
-
+				asset: '/images/laser.png'
 
 			});
 
@@ -272,7 +272,7 @@ window.addEventListener("load",function() {
 
 		step: function(dt){
 			this.timeCounter += dt;
-			if( this.timeCounter >= 5 ){
+			if( this.timeCounter >= 10 ){
 				this.spawnUnit();
 				this.timeCounter = 0;
 			}
@@ -281,11 +281,16 @@ window.addEventListener("load",function() {
 
 		spawnUnit: function(){
 			var enemy = new Q.Enemy({ x: this.p.x, y: this.p.y });
+			console.log( enemy.p.x );
+			console.log( enemy.p.y );
 			var ai = new Ai(enemy);
 			ai.add(new Behavior_Follow(1, Q('Player').first(), 100));
 			ai.add(new Behavior_Attack(1, Q('Player').first()));
 			enemy.p.ai = ai;
 			this.stage.insert(enemy);
+
+			console.log('Spawning');
+			console.log( this.p );
 		}
 	});
 
