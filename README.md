@@ -3,6 +3,13 @@ LD30
 
 CSULB ACM's submission for Ludum Dare 30.
 
+Controls
+========
+
+Walk with either wasd or the arrow keys
+Walk up to a portal and press f to destroy it.
+
+
 # Good luck guys! #
 
 Install guide

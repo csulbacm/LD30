@@ -9,14 +9,13 @@ Q.Sprite.extend('Player', {
 			h: 64,
 			vx: 1,
 			vy: 1,
-			speed: 64,
+			speed: 200,
 			animState: 0,
 			type: Q.SPRITE_PLAYER,
-			collisionMask: Q.SPRITE_WALL | Q.SPRITE_COLLECTABLE | Q.SPRITE_BULLET,
+			collisionMask: Q.SPRITE_WALL | Q.SPRITE_COLLECTABLE | Q.SPRITE_BULLET | Q.SPRITE_DOOR,
 			health: 10,
 			items: 0,
 			sensor: true
-
 		});
 
 		this.animStates = {
@@ -36,24 +35,50 @@ Q.Sprite.extend('Player', {
 		this.direct_left = 4;
 		this.direct_down = 8;
 
+		this.lastShotTime = 0;
+		this.portalTouching;
+
 		this.add('2d, animation');
 		this.play( this.animStates[this.p.animState] );
 
-		this.on('hit.sprite', function(collision){
-			if(collision.obj.isA('Tower')){
-				this.destroy();
-			}
-		});
+		this.on('sensor', this.collisionCheck);
+
+		this.on('hit.sprite', this.collisionCheck);
 
 		Q.input.on('up', this, 'goUp');
 		Q.input.on('left', this, 'goLeft');
 		Q.input.on('down', this, 'goDown');
 		Q.input.on('right', this, 'goRight');
+		Q.input.on('activate', this, 'closePortal');
+	},
+
+	collisionCheck: function(collision){
+		if( collision.obj )
+		{
+			if( collision.obj.isA('Spawner') )
+				this.portalTouching = collision.obj;
+			else if( collision.obj.isA('ShipItem') )
+			{
+				this.foundItem();
+				collision.obj.destroy();
+			}
+		}
+
+	},
+
+	closePortal: function(){
+		if( this.portalTouching )
+		{
+			this.portalTouching.closePortal();
+			console.log('Portals Left: ' + Q('Spawner').length);
+		}
 	},
 
 	step: function(dt){
+		this.portalTouching = null;
 		this.p.vx = this.p.vy = 0;
 		this.p.animState = 0;
+		this.lastShotTime += dt;
 		if( Q.inputs['up'] )
 		{
 			this.p.animState = this.p.animState | this.direct_up;
@@ -78,7 +103,12 @@ Q.Sprite.extend('Player', {
 
 		this.p.x += this.p.vx * dt;
 		this.p.y += this.p.vy * dt;
-		this.shoot();
+
+		if( this.lastShotTime > 0.25 )
+		{
+			this.lastShotTime = 0;
+			this.shoot();
+		}
 	},
 
 	goUp: function(){
@@ -134,33 +164,30 @@ Q.Sprite.extend('Enemy', {
 			speed: 32,
 			health: 2,
 			target: this,
-			type: Q.SPRITE_ENEMY,
+			type: Q.SPRITE_WALL | Q.SPRITE_ENEMY,
 			collisionMask: Q.SPRITE_WALL | Q.SPRITE_BULLET,
 			projectile: null,
 			ai: null,
 			sensor: true,
-			animState: {
-				 0: 'walk_left',
-				 1: 'idle',
-				 2: 'walk_right'
-			}
 		});
 
 		this.add('2d, animation');
-		this.play('walk_right');
+		this.play('walk_left');
 	},
 
 	step: function(dt){
+
 		if(this.p.ai) {
 			this.p.ai.step(dt);
+			if( this.p.vx < 0 )
+				this.play('walk_left');
+			else if( this.p.vx > 0 )
+				// TODO: Fix this by getting Suzie to flip sprites on sheet. Quintus flipping seems to be janky.
+				this.play('walk_right');
+			else
+				this.play('idle');
 		}
 		
-		if( this.p.vx < 0 )
-			this.play('walk_left');
-		else if( this.p.vy > 0 )
-			this.play('walk_right');
-		else if( this.p.vx == 0 )
-			this.play('idle');
 	},
 
 	hit: function( dmg ){
@@ -246,22 +273,13 @@ Q.Sprite.extend('ShipItem', {
 	init: function(p){
 		this._super(p, {
 			x: 400,
-			y: 400,
+			y: 550,
 			type: Q.SPRITE_COLLECTABLE,
 			collisionMask: Q.SPRITE_PLAYER,
 			asset: '/images/laser.png'
 		});
 
 		this.add('2d');
-
-		this.on('hit.sprite', function(collision){
-			if(collision.obj.isA('Player'))
-			{
-				collision.obj.foundItem();
-				console.log(collision.obj.p.items);
-				this.destroy();
-			}
-		})
 	}
 })
 
@@ -270,18 +288,20 @@ Q.Sprite.extend('Spawner', {
 		this._super(p, {
 			sheet:  'portal',
 			sprite: 'portal',
-			type: Q.SPRITE_NONE,
-			collisionMask: Q.SPRITE_NONE,
-			asset: '/images/laser.png'
-
+			w: 142,
+			h: 145,
+			type: Q.SPRITE_DOOR,
+			collisionMask: Q.SPRITE_PLAYER,
+			sensor: true,
+			collision: false,
+			asset: '/images/laser.png',
+			dead: false,
+			startDeadTimer: 0
 		});
 
 		this.add('2d, animation');
 		this.play('idle')
 		this.timeCounter = 0;
-		this.on('mouseup', function(){
-			console.log('mousedown event');
-		})
 	},
 
 	step: function(dt){
@@ -290,16 +310,30 @@ Q.Sprite.extend('Spawner', {
 			this.spawnUnit();
 			this.timeCounter = 0;
 		}
+
+		if( this.isDead() )
+		{
+			this.p.startDeadTimer += dt;
+			if( this.p.startDeadTimer >= 1 )
+				this.destroy();
+		}
 	},
 
 	spawnUnit: function(){
 		var enemy = new Q.Enemy({ x: this.p.x, y: this.p.y });
-		console.log( enemy.p.x );
-		console.log( enemy.p.y );
 		var ai = new Ai(enemy);
 		ai.add(new Behavior_Follow(1, Q('Player').first(), 100));
 		ai.add(new Behavior_Attack(1, Q('Player').first()));
 		enemy.p.ai = ai;
 		this.stage.insert(enemy);
+	},
+
+	closePortal: function(){
+		this.play('close');
+		this.p.dead = true;
+	},
+
+	isDead: function(){
+		return this.p.dead;
 	}
 });

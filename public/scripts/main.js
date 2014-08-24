@@ -1,16 +1,17 @@
 
 var Q = Quintus({ development: true });
 
-	   Q.include('Sprites, Scenes, Input, 2D, Anim, UI, TMX, Touch')
-		.setup({ maximize: true })
-		.controls(true)
-		.touch(Q.SPRITE_ALL);
+       Q.include('Sprites, Scenes, Input, 2D, Anim, UI, TMX, Touch')
+        .setup({ maximize: true })
+        .controls(true)
+        .touch(Q.SPRITE_ALL);
 
 Q.input.keyboardControls({
-	87: 'up',	// W
-	65: 'left',	// A
-	83: 'down',	// S
-	68: 'right'	// D
+    87: 'up',       // W
+    65: 'left',     // A
+    83: 'down',     // S
+    68: 'right',    // D
+    70: 'activate', // F
 });
 
 Q.input.touchControls();
@@ -31,73 +32,72 @@ Q.SPRITE_WALL = 32;
 
 
 Q.el.addEventListener('mousedown', function(){
-	var player = Q('Player').first();
-	if( player )
-		player.shoot();
+    var player = Q('Player').first();
+    if( player )
+        player.shoot();
 });
 
 Q.scene('level1', function(stage){
-	
-	Q.stageTMX('/levels/test-level2.tmx', stage);
-	
-	var player = Q('Player').first();
-	var previous = player;
-	var enemys = [];
+    
+    Q.stageTMX('/levels/test-level2.tmx', stage);
+    
+    var player = Q('Player').first();
+    var previous = player;
+    var enemys = [];
 
-	for(var i =0; i< 5; i++) {
-		var enemy = stage.insert(new Q.Enemy({ x: 110+100*i, y: 110+100*i, target: previous, speed: 100 }));
-		var ai = new Ai(enemy);
-		ai.add(new Behavior_Follow(1, player, 100));
-		ai.add(new Behavior_Attack(1, player));
-		enemy.p.ai = ai;
-		enemys.push( enemy );
-		previous = enemys[i];
-	}
+    for(var i =0; i< 5; i++) {
+        var enemy = stage.insert(new Q.Enemy({ x: 110+100*i, y: 110+100*i, target: previous, speed: 100 }));
+        var ai = new Ai(enemy);
+        ai.add(new Behavior_Follow(1, player, 100));
+        ai.add(new Behavior_Attack(1, player));
+        enemy.p.ai = ai;
+        enemys.push( enemy );
+        previous = enemys[i];
+    }
 
-	stage.insert(new Q.ShipItem());
+    stage.insert(new Q.ShipItem());
 
-	stage.add('viewport').follow(Q('Player').first());
+    stage.add('viewport').follow(Q('Player').first());
 
 });
 
 Q.loadTMX(['/images/dragon_hit1.png', 
-		'/images/laser.png', 
-		'/levels/test-level.tmx',
-		'/levels/test-level2.tmx',
-		'/images/tiles.png',
-		'/images/portals.png',
-		'/images/robots.png',
-		'/images/lasers.png'
+        '/images/laser.png', 
+        '/levels/test-level.tmx',
+        '/levels/test-level2.tmx',
+        '/images/tiles.png',
+        '/images/portals.png',
+        '/images/robots.png',
+        '/images/lasers.png'
+    ], function(){
+    
+    Q.sheet('player', '/images/dragon_hit1.png', {
+        tilew: 67.71,
+        tileh: 67.75,
+        sx: 0,
+        sy: 0
+    });
 
-	], function(){
-	
-	Q.sheet('player', '/images/dragon_hit1.png', {
-		tilew: 67.71,
-		tileh: 67.75,
-		sx: 0,
-		sy: 0
-	});
+    Q.sheet('portal', '/images/portals.png', {
+        tilew:  142,
+        tileh:  145,
+        sx:     0,
+        sy:     0,
+    });
 
-	Q.sheet('portal', '/images/portals.png', {
-		tilew:  142,
-		tileh:  145,
-		sx: 	0,
-		sy: 	0,
-	});
+    Q.sheet('robot', '/images/robots.png', {
+        tilew: 61,
+        tileh: 75,
+        sx: 0,
+        sy: 0,
+    });
 
-	Q.sheet('robot', '/images/robots.png', {
-		tilew: 61,
-		tileh: 75,
-		sx: 0,
-		sy: 0,
-	});
+    Q.sheet('lasers', '/images/lasers.png', {
+        tilew: 64,
+        tileh: 48,
+        sx: 0,
+        sy: 8,
+    });
 
-	Q.sheet('lasers', '/images/lasers.png', {
-		tilew: 64,
-		tileh: 48,
-		sx: 0,
-		sy: 8,
-	});
-
-	Q.stageScene('level1');
+    Q.stageScene('level1');
 });
