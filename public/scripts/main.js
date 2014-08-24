@@ -47,7 +47,7 @@ Q.scene('level1', function(stage){
 	for(var i =0; i< 5; i++) {
 		var enemy = stage.insert(new Q.Enemy({ x: 110+100*i, y: 110+100*i, target: previous, speed: 100 }));
 		var ai = new Ai(enemy);
-		ai.add(new Behavior_Follow(1, previous, 100));
+		ai.add(new Behavior_Follow(1, player, 100));
 		ai.add(new Behavior_Attack(1, player));
 		enemy.p.ai = ai;
 		enemys.push( enemy );
@@ -63,6 +63,7 @@ Q.scene('level1', function(stage){
 Q.loadTMX(['/images/dragon_hit1.png', 
 		'/images/laser.png', 
 		'/levels/test-level.tmx',
+		'/levels/test-level2.tmx',
 		'/images/tiles.png'
 	], function(){
 	Q.sheet('player', '/images/dragon_hit1.png', {
