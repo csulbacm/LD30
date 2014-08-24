@@ -178,7 +178,7 @@ Q.Sprite.extend('Laser', {
 			if(collision.obj.isA('Player')){
 				if(this.p.shooter)
 					this.p.shooter.p.projectile = null;
-				//this.destroy();
+				this.destroy();
 			} else if( collision.obj.p.type == Q.SPRITE_WALL ){
 				if(this.p.shooter)
 					this.p.shooter.p.projectile = null;
@@ -227,12 +227,16 @@ Q.Sprite.extend('ShipItem', {
 Q.Sprite.extend('Spawner', {
 	init: function(p){
 		this._super(p, {
+			sheet:  'portal',
+			sprite: 'portal',
 			type: Q.SPRITE_NONE,
 			collisionMask: Q.SPRITE_NONE,
 			asset: '/images/laser.png'
 
 		});
 
+		this.add('2d, animation');
+		this.play('idle')
 		this.timeCounter = 0;
 		this.on('mouseup', function(){
 			console.log('mousedown event');

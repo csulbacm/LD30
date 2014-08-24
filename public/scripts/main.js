@@ -52,7 +52,7 @@ Q.scene('level1', function(stage){
 		enemys.push( enemy );
 		previous = enemys[i];
 	}
-	
+
 	stage.insert(new Q.ShipItem());
 
 	stage.add('viewport').follow(Q('Player').first());
@@ -62,13 +62,22 @@ Q.scene('level1', function(stage){
 Q.loadTMX(['/images/dragon_hit1.png', 
 		'/images/laser.png', 
 		'/levels/test-level.tmx',
-		'/images/tiles.png'
+		'/images/tiles.png',
+		'/images/portals.png'
 	], function(){
+	
 	Q.sheet('player', '/images/dragon_hit1.png', {
 		tilew: 67.71,
 		tileh: 67.75,
-		sx: 0,
-		sy: 0
+		sx: 	   0,
+		sy: 	   0
+	});
+
+	Q.sheet('portal', '/images/portals.png', {
+		tilew:  142,
+		tileh:  145,
+		sx: 	0,
+		sy: 	0,
 	});
 
 	Q.stageScene('level1');
