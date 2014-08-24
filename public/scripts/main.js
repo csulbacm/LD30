@@ -1,8 +1,10 @@
 
-var Q = Quintus({ development: true })
-		.include('Sprites, Scenes, Input, 2D, Anim, UI, TMX')
+var Q = Quintus({ development: true });
+
+	   Q.include('Sprites, Scenes, Input, 2D, Anim, UI, TMX, Touch')
 		.setup({ maximize: true })
-		.controls(true);
+		.controls(true)
+		.touch(Q.SPRITE_ALL);
 
 Q.input.keyboardControls({
 	87: 'up',	// W
@@ -10,6 +12,9 @@ Q.input.keyboardControls({
 	83: 'down',	// S
 	68: 'right'	// D
 });
+
+Q.input.touchControls();
+Q.input.mouseControls({ cursor: 'on' });
 
 // Joypads don't seem to work.
 // Q.input.joypadControls();
@@ -25,6 +30,12 @@ Q.SPRITE_BULLET = 16;
 Q.SPRITE_WALL = 32;
 
 
+Q.el.addEventListener('mousedown', function(){
+	var player = Q('Player').first();
+	if( player )
+		player.shoot();
+});
+
 Q.scene('level1', function(stage){
 	
 	Q.stageTMX('/levels/test-level.tmx', stage);
@@ -32,6 +43,7 @@ Q.scene('level1', function(stage){
 	var player = Q('Player').first();
 	var previous = player;
 	var enemys = [];
+
 	for(var i =0; i< 5; i++) {
 		var enemy = stage.insert(new Q.Enemy({ x: 110+100*i, y: 110+100*i, target: previous, speed: 100 }));
 		var ai = new Ai(enemy);
@@ -43,7 +55,6 @@ Q.scene('level1', function(stage){
 	}
 	
 	stage.insert(new Q.ShipItem());
-	stage.insert(new Q.Spawner({ x: 600, y: 600 }));
 
 	stage.add('viewport').follow(Q('Player').first());
 
