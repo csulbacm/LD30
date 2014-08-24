@@ -9,3 +9,9 @@ Q.animations('player', {
 	run_left: 	{ frames: [49, 50, 51, 52, 53, 54, 55], rate: 1/15 },
 	standing: 	{ frames: [28] }
 });
+
+/*
+Q.animations('portal', {
+
+})
+*/

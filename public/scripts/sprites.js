@@ -105,13 +105,15 @@ Q.Sprite.extend('Player', {
 	},
 
 	shoot: function(){
-		/*
-		var angle += (Math.random()-.5)*45;
-		var dx = Math.cos(angle*Math.PI/180)*this.speed;
-		var dy = Math.sin(angle*Math.PI/180)*this.speed;
-		// Check if need range.
-		thisAi.self.stage.insert(new Q.Laser({ x: this.p.x, y: this.p.y,vx:dx, vy:dy, range: this.range, angle: angle+90}));
-		*/
+		var dx = (Q.inputs['mouseX'] - this.p.x);
+		var dy = (Q.inputs['mouseY'] - this.p.y);
+		var angle = ((Math.atan2(dy, dx) * 180/Math.PI))
+		
+		dx = Math.cos(angle*Math.PI/180)*this.p.speed;
+		dy = Math.sin(angle*Math.PI/180)*this.p.speed;
+
+		var laser = new Q.Laser({ x: this.p.x, y: this.p.y,vx:dx, vy:dy, angle: angle+90});
+		this.stage.insert(laser);
 	}
 
 });
@@ -176,7 +178,7 @@ Q.Sprite.extend('Laser', {
 			if(collision.obj.isA('Player')){
 				if(this.p.shooter)
 					this.p.shooter.p.projectile = null;
-				this.destroy();
+				//this.destroy();
 			} else if( collision.obj.p.type == Q.SPRITE_WALL ){
 				if(this.p.shooter)
 					this.p.shooter.p.projectile = null;
@@ -232,6 +234,9 @@ Q.Sprite.extend('Spawner', {
 		});
 
 		this.timeCounter = 0;
+		this.on('mouseup', function(){
+			console.log('mousedown event');
+		})
 	},
 
 	step: function(dt){
