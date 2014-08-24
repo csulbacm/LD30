@@ -114,6 +114,6 @@ Behavior_Attack.prototype.step = function(dT, thisAi) {
 	this.time_elapsed += dT;
 	if(this.time_elapsed > 1) {
 		this.time_elapsed -= 1;
-		thisAi.add(new Behavior_Shoot(1, this.target.p.x, this.target.p.y, 100, 100));
+		thisAi.add(new Behavior_Shoot(1, this.target.p.x, this.target.p.y, 100, 200));
 	}
 }

@@ -111,8 +111,8 @@ Q.Sprite.extend('Player', {
 		var dy = (Q.inputs['mouseY'] - this.p.y);
 		var angle = ((Math.atan2(dy, dx) * 180/Math.PI))
 		
-		dx = Math.cos(angle*Math.PI/180)*this.p.speed;
-		dy = Math.sin(angle*Math.PI/180)*this.p.speed;
+		dx = Math.cos(angle*Math.PI/180)*200;
+		dy = Math.sin(angle*Math.PI/180)*200;
 
 		var laser = new Q.Laser({ x: this.p.x, y: this.p.y,vx:dx, vy:dy, angle: angle+90, shooter: this});
 		this.stage.insert(laser);
@@ -166,7 +166,7 @@ Q.Sprite.extend('Laser', {
 			y: 0,
 			vx: 0,
 			vy: 0,
-			speed: 100,
+			speed: 200,
 			target: this,
 			range: 1000,
 			distance: 0,
