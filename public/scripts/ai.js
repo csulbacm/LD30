@@ -56,11 +56,11 @@ function Behavior(type, priority) {
 }
 
 Behavior.prototype.step = function(dT, thisAi) {
-
+	console.log('undefined step');
 }
 
 function Behavior_Follow(priority, target, range) {
-	Behavior.call('move', priority);
+	Behavior.call('follow', priority);
 	this.target = target;
 	this.range = range;
 }
@@ -90,12 +90,12 @@ Behavior_Follow.prototype.step = function(dT, thisAi) {
 }
 
 function Behavior_Follow_Astar(priority, target) {
-	Behavior.call('follow', priority);
+	Behavior.call('path', priority);
 	this.target = target;
 	this.path = null;
 }
 
-Behavior_Follow.prototype.step = function(dT, thisAi) {
+Behavior_Follow_Astar.prototype.step = function(dT, thisAi) {
 	if(this.path == null) {
 		//create and add a path follow
 	} else {
@@ -107,7 +107,7 @@ Behavior_Follow.prototype.step = function(dT, thisAi) {
 }
 
 function Behavior_Follow_Path(priority, points) {
-	Behavior.call('move', priority);
+	Behavior.call('follow', priority);
 	this.points = points;
 	this.cur = 0;
 	this.thresh = 1;
