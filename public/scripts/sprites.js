@@ -10,7 +10,6 @@ Q.Sprite.extend('Player', {
 			vx: 1,
 			vy: 1,
 			speed: 200,
-			animState: 0,
 			type: Q.SPRITE_PLAYER,
 			collisionMask: Q.SPRITE_WALL | Q.SPRITE_COLLECTABLE | Q.SPRITE_BULLET | Q.SPRITE_DOOR,
 			health: 10,
@@ -18,38 +17,21 @@ Q.Sprite.extend('Player', {
 			sensor: true
 		});
 
-		this.animStates = {
-			 0: 'standing',
-		 	 1: 'run_right',
-		 	 2: 'run_up',
-		 	 4: 'run_left',
-		 	 8: 'run_down',
-		 	 3: 'run_dur',
-		 	 6: 'run_dul',
-		 	 9: 'run_ddr',
-			12: 'run_ddl',
-		};
-
-		this.direct_right = 1;
-		this.direct_up = 2;
-		this.direct_left = 4;
-		this.direct_down = 8;
-
 		this.lastShotTime = 0;
 		this.portalTouching;
 
 		this.add('2d, animation');
-		this.play( this.animStates[this.p.animState] );
 
 		this.on('sensor', this.collisionCheck);
-
 		this.on('hit.sprite', this.collisionCheck);
 
+		/*
 		Q.input.on('up', this, 'goUp');
 		Q.input.on('left', this, 'goLeft');
 		Q.input.on('down', this, 'goDown');
 		Q.input.on('right', this, 'goRight');
-		Q.input.on('activate', this, 'closePortal');
+		*/
+		Q.input.on('action', this, 'closePortal');
 	},
 
 	collisionCheck: function(collision){
@@ -63,12 +45,12 @@ Q.Sprite.extend('Player', {
 				collision.obj.destroy();
 			}
 		}
-
 	},
 
 	closePortal: function(){
-		if( this.portalTouching )
+		if( this.portalTouching /*&& this.p.items > 0*/ )
 		{
+			this.p.items -= 1;
 			this.portalTouching.closePortal();
 			Q.clearStage(1);
 
@@ -76,8 +58,10 @@ Q.Sprite.extend('Player', {
 			Q.stageScene('hud', 1, { health: this.p.health, portals: portalsLeft });
 
 			if( portalsLeft <= 0 ){
-				//Q.GameState.level = 'level' + (parseInt( Q.GameState.level.slice(5) ) + 1);
-				Q.stageScene('NextLevel',2);
+				if( Q.GameState.level + 1 >= Q.levels.length )
+					Q.stageScene('GameOver',2, { textLabel: 'You Won', buttonLabel: 'Play Again?' });
+				else
+					Q.stageScene('NextLevel',2);
 			}
 		}
 	},
@@ -85,29 +69,28 @@ Q.Sprite.extend('Player', {
 	step: function(dt){
 		this.portalTouching = null;
 		this.p.vx = this.p.vy = 0;
-		this.p.animState = 0;
 		this.lastShotTime += dt;
+		
 		if( Q.inputs['up'] )
-		{
-			this.p.animState = this.p.animState | this.direct_up;
 			this.p.vy = -this.p.speed;
-		}
+
 		if( Q.inputs['left'] )
-		{
-			this.p.animState = this.p.animState | this.direct_left;
 			this.p.vx = -this.p.speed;
-		}
+
 		if( Q.inputs['down'] )
-		{
-			this.p.animState = this.p.animState | this.direct_down;
 			this.p.vy =  this.p.speed;
-		}
+
 		if( Q.inputs['right'] )
-		{
-			this.p.animState = this.p.animState | this.direct_right;
 			this.p.vx =  this.p.speed;
-		}
-		this.play( this.animStates[this.p.animState] );
+
+
+		if( this.p.vx < 0 )
+			this.play('walk_left');
+		else if( this.p.vx == 0 && this.p.vy == 0 )
+			this.play('idle');
+		else
+			this.play('walk_right');
+
 
 		this.p.x += this.p.vx * dt;
 		this.p.y += this.p.vy * dt;
@@ -117,22 +100,6 @@ Q.Sprite.extend('Player', {
 			this.lastShotTime = 0;
 			this.shoot();
 		}
-	},
-
-	goUp: function(){
-		this.p.animState = 'run_up';
-	},
-
-	goDown: function(){
-		this.p.animState = 'run_down';
-	},
-
-	goLeft: function(){
-		this.p.animState = 'run_left';
-	},
-
-	goRight: function(){
-		this.p.animState = 'run_right';
 	},
 
 	hit: function( dmg ){
