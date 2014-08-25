@@ -179,7 +179,7 @@ function Astar_Node(index, cost, distance) {
 	this.distance = distance;
 }
 
-Astar_Node.prototype.total_cost = funtion() {
+Astar_Node.prototype.total_cost = function() {
 	return cost + distance;
 }
 
