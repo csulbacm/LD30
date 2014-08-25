@@ -33,6 +33,8 @@ Q.levels = [
 	'level2'
 ];
 
+Q.astar = null;
+
 
 Q.el.addEventListener('mousedown', function(){
     var player = Q('Player').first();
@@ -44,6 +46,7 @@ Q.loadTMX(['/images/dragon_hit1.png',
         '/images/laser.png', 
         '/levels/test-level.tmx',
         '/levels/test-level2.tmx',
+        '/levels/big-test.tmx',
         '/images/tiles.png',
         '/images/portals.png',
         '/images/robots.png',
@@ -82,5 +85,6 @@ Q.loadTMX(['/images/dragon_hit1.png',
     });
 
     Q.stageScene('level2');
+    Q.astar = new Astar();
     Q.GameState.level = 0;
 });

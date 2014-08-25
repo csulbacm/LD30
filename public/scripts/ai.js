@@ -162,7 +162,7 @@ Behavior_Attack.prototype.step = function(dT, thisAi) {
 */
 
 
-function node(index, edges, x, y) {
+function node(index, edges, x, y, open) {
 	this.index = index;
 	this.edges = edges;
 	this.x = x;
@@ -172,6 +172,7 @@ function node(index, edges, x, y) {
 	this.distance = -1;
 	this.run = -1;
 	visited = false;
+	this.open = open;
 }
 
 node.prototype.setAstar = function(parent, cost, distance) {
@@ -189,8 +190,109 @@ function edge(index, cost) {
 	this.cost = cost;
 }
 
-function Astar(nodeList) {
-	this.nodeList = nodeList;
+//must recreate when loading a level
+//TODO: tilesize is 64 until we figure out how to get that from quintus
+function Astar() {
+	this.nodeList = Array();
+	//readmap
+	index = 0;
+	this.nodeLookup = {};
+	for(x=32; x<Q.stage.width; x+=64) {
+		for(y=32; y<Q.stage.width; y+=64) {
+			cur = new node(index,new Array, x, y, Q.stage.locate(x, y, Q.SPRITE_WALL));
+			this.nodeList.push(cur);
+			this.nodeLookup[''+x+','+y] = index;
+			index++;
+		}
+	}
+	//check every node for connected
+	for(i=0; i<this.nodeList.length; i++) {
+		cur = this.nodeList[i];
+		var point;
+		var up = down = left = right = false;
+
+		//up
+		point = ''+(cur.x)+','+(cur.y-64);
+		if(point in this.nodeLookup) {
+			neighbor = this.nodeList[this.nodeLookup[point]]
+			if(neighbor.open) {
+				up = true;
+				cur.edges.push(new edge(neighbor.index), 1);
+			}
+		}
+
+		//down
+		point = ''+(cur.x)+','+(cur.y+64);
+		if(point in this.nodeLookup) {
+			neighbor = this.nodeList[this.nodeLookup[point]]
+			if(neighbor.open) {
+				down = true;
+				cur.edges.push(new edge(neighbor.index), 1);
+			}
+		}
+
+		//right
+		point = ''+(cur.x+64)+','+(cur.y);
+		if(point in this.nodeLookup) {
+			neighbor = this.nodeList[this.nodeLookup[point]]
+			if(neighbor.open) {
+				up = right;
+				cur.edges.push(new edge(neighbor.index), 1);
+			}
+		}
+
+		//left
+		point = ''+(cur.x-64)+','+(cur.y);
+		if(point in this.nodeLookup) {
+			neighbor = this.nodeList[this.nodeLookup[point]]
+			if(neighbor.open) {
+				up = left;
+				cur.edges.push(new edge(neighbor.index), 1);
+			}
+		}
+
+		//up right
+		point = ''+(cur.x+64)+','+(cur.y-64);
+		if(point in this.nodeLookup) {
+			neighbor = this.nodeList[this.nodeLookup[point]]
+			if(neighbor.open && up && right) {
+				up = true;
+				cur.edges.push(new edge(neighbor.index), 1);
+			}
+		}
+
+		//up left
+		point = ''+(cur.x+64)+','+(cur.y+64);
+		if(point in this.nodeLookup) {
+			neighbor = this.nodeList[this.nodeLookup[point]]
+			if(neighbor.open && up && left) {
+				down = true;
+				cur.edges.push(new edge(neighbor.index), 1);
+			}
+		}
+
+		//down right
+		point = ''+(cur.x+64)+','+(cur.y+64);
+		if(point in this.nodeLookup) {
+			neighbor = this.nodeList[this.nodeLookup[point]]
+			if(neighbor.open && down && right) {
+				up = right;
+				cur.edges.push(new edge(neighbor.index), 1);
+			}
+		}
+
+		//down left
+		point = ''+(cur.x-64)+','+(cur.y+64);
+		if(point in this.nodeLookup) {
+			neighbor = this.nodeList[this.nodeLookup[point]]
+			if(neighbor.open && down && left) {
+				up = left;
+				cur.edges.push(new edge(neighbor.index), 1);
+			}
+		}
+
+
+	}
 }
 
 

@@ -48,6 +48,13 @@ Q.scene('level2', function(stage){
     Q.stageScene('hud', 1, { health: Q('Player').first().p.health, portals: Q('Spawner').length });
 });
 
+Q.scene('big', function(stage){
+    Q.stageTMX('/levels/big-test.tmx', stage);
+    stage.add('viewport').follow(Q('Player').first());
+    stage.insert(new Q.HealthPup({ x: 600, y: 550, healthAmount: 10 }));
+    Q.stageScene('hud', 1, { health: Q('Player').first().p.health, portals: Q('Spawner').length });
+});
+
 Q.scene('GameOver', function(stage){
 	Q.stage(0).pause();
 
