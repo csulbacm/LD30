@@ -44,14 +44,8 @@ Q.scene('level1', function(stage){
 Q.scene('level2', function(stage){
     Q.stageTMX('/levels/test-level2.tmx', stage);
     stage.add('viewport').follow(Q('Player').first());
-    stage.insert(new Q.HealthPup({ x: 600, y: 550, healthAmount: 10 }));
+    //stage.insert(new Q.HealthPup({ x: 600, y: 550, healthAmount: 10 }));
     Q.stageScene('hud', 1, { health: Q('Player').first().p.health, portals: Q('Spawner').length });
-
-    /*
-    console.log( stage );
-    console.log( stage._collisionLayer );
-    console.log( stage._collisionLayer.)
-    */
 });
 
 Q.scene('level3', function(stage){
@@ -59,7 +53,7 @@ Q.scene('level3', function(stage){
     Q.stageTMX('/levels/map03.tmx', stage);
 
     stage.add('viewport').follow(Q('Player').first());
-    //Q.stageScene('hud', 1, { health: Q('Player').first().p.health, portals: Q('Spawner').length });
+    Q.stageScene('hud', 1, { health: Q('Player').first().p.health, portals: Q('Spawner').length });
 });
 
 Q.scene('GameOver', function(stage){

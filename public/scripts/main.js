@@ -41,8 +41,7 @@ Q.el.addEventListener('mousedown', function(){
         player.shoot();
 });
 
-Q.loadTMX(['/images/dragon_hit1.png', 
-        '/images/laser.png', 
+Q.loadTMX(['/images/laser.png', 
         '/levels/test-level.tmx',
         '/levels/test-level2.tmx',
         '/images/tiles.png',
@@ -50,9 +49,8 @@ Q.loadTMX(['/images/dragon_hit1.png',
         '/images/robots.png',
         '/images/lasers.png',
         '/images/player.png',
-        '/levels/test-level-3.tmx',
         '/images/TILEMAP.png',
-        '/levels/map03.tmx'
+        '/levels/map03.tmx',
     ], function(){
     
     Q.sheet('player', '/images/player.png', {
