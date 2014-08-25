@@ -34,6 +34,8 @@ Q.levels = [
 	'level3'
 ];
 
+Q.astar = null;
+
 
 Q.el.addEventListener('mousedown', function(){
     var player = Q('Player').first();
@@ -44,6 +46,7 @@ Q.el.addEventListener('mousedown', function(){
 Q.loadTMX(['/images/laser.png', 
         '/levels/test-level.tmx',
         '/levels/test-level2.tmx',
+        '/levels/big-test.tmx',
         '/images/tiles.png',
         '/images/portals.png',
         '/images/robots.png',
@@ -83,6 +86,7 @@ Q.loadTMX(['/images/laser.png',
         sy: 8,
     });
 
-    Q.stageScene('level3');
+    Q.stageScene('level1');
+    Q.astar = new Astar();
     Q.GameState.level = 0;
 });
