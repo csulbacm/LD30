@@ -39,21 +39,21 @@ Q.Sprite.extend('Player', {
 				collision.obj.destroy();
 			}
 			else if( collision.obj.isA('HealthPup') ){
-				this.heal( collision.obj.healthAmount );
+				this.heal( collision.obj.p.healthAmount );
 				collision.obj.destroy();
 			}
 		}
 	},
 
 	closePortal: function(){
-		if( this.portalTouching /*&& this.p.items > 0*/ )
+		if( this.portalTouching && this.p.items > 0 )
 		{
 			this.p.items -= 1;
 			this.portalTouching.closePortal();
 			Q.clearStage(1);
 
 			var portalsLeft = ( Q('Spawner').length - 1 );
-			Q.stageScene('hud', 1, { health: this.p.health, portals: portalsLeft });
+			Q.stageScene('hud', 1, { health: this.p.health, items: this.p.items, portals: portalsLeft });
 
 			if( portalsLeft <= 0 ){
 				if( Q.GameState.level + 1 >= Q.levels.length )
@@ -106,14 +106,14 @@ Q.Sprite.extend('Player', {
 		if( this.p.health > this.p.maxHealth )
 			this.p.health = this.p.maxHealth;
 		Q.clearStage(1);
-		Q.stageScene('hud', 1, { health: this.p.health, portals: Q('Spawner').length });
+		Q.stageScene('hud', 1, { health: this.p.health, items: this.p.items, portals: Q('Spawner').length });
 	},
 
 	hit: function( dmg ){
 		dmg = dmg || 1;
 		this.p.health -= Math.abs(dmg);
 		Q.clearStage(1);
-		Q.stageScene('hud', 1, { health: this.p.health, portals: Q('Spawner').length });
+		Q.stageScene('hud', 1, { health: this.p.health, items: this.p.items, portals: Q('Spawner').length });
 		if( this.p.health <= 0 )
 			this.kill();
 	},
@@ -126,6 +126,8 @@ Q.Sprite.extend('Player', {
 
 	foundItem: function(){
 		this.p.items += 1;
+		Q.clearStage(1);
+		Q.stageScene('hud', 1, { health: this.p.health, items: this.p.items, portals: Q('Spawner').length });
 	},
 
 	shoot: function(){
@@ -203,7 +205,7 @@ Q.Sprite.extend('Laser', {
 			h: 48,
 			vx: 1,
 			vy: 1,
-			speed: 200,
+			speed: 400,
 			target: this,
 			range: 1000,
 			distance: 0,
@@ -257,10 +259,12 @@ Q.Sprite.extend('ShipItem', {
 			y: 550,
 			type: Q.SPRITE_COLLECTABLE,
 			collisionMask: Q.SPRITE_PLAYER,
-			asset: '/images/laser.png'
+			sheet: 'tilemap',
+			sprite: 'tilemap',
 		});
 
-		this.add('2d');
+		this.add('2d, animation');
+		this.play('dynamite');
 	}
 })
 
@@ -330,12 +334,15 @@ Q.Sprite.extend('HealthPup', {
 	init: function(p){
 		this._super(p, {
 			healthAmount: 10,
-			asset: '/images/laser.png',
+			sprite: 'tilemap',
+			sheet: 'tilemap',
 			x: 0,
 			y: 0,
 			type: Q.SPRITE_COLLECTABLE,
 			collisionMask: Q.SPRITE_PLAYER,
 			sensor: true,
 		});
+		this.add('2d, animation');
+		this.play('turkey');
 	}
 })

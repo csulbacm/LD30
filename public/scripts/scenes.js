@@ -1,5 +1,4 @@
 Q.scene('hud', function(stage){
-
 	var containerLeft = stage.insert(new Q.UI.Container({
 		fill: 'black',
 		border: 5,
@@ -19,13 +18,19 @@ Q.scene('hud', function(stage){
 		border: 5,
 		shadow: 10,
 		shadowColor: 'rgb(0,0,0,5)',
-		x:  (Q.width - 140),
+		x:  (Q.width - 300),
 		y: 50
 	}));
 
-	containerRight.insert( new Q.UI.Text({
+	var portalsText = containerRight.insert( new Q.UI.Text({
 		label: 'Portals: ' + stage.options.portals,
 		color: 'green'
+	}));
+
+	containerRight.insert( new Q.UI.Text({
+		label: 'Dynamite: ' + stage.options.items,
+		color: 'green',
+		x: 40 + portalsText.p.w
 	}));
 
     containerLeft.fit(20,20);
@@ -36,17 +41,13 @@ Q.scene('hud', function(stage){
 Q.scene('level1', function(stage){
     Q.stageTMX('/levels/test-level2.tmx', stage);
     stage.add('viewport').follow(Q('Player').first());
-    //stage.insert(new Q.HealthPup({ x: 600, y: 550, healthAmount: 10 }));
-    Q.stageScene('hud', 1, { health: Q('Player').first().p.health, portals: Q('Spawner').length });
+    Q.stageScene('hud', 1, { health: Q('Player').first().p.health, items: Q('Player').first().p.items, portals: Q('Spawner').length });
 });
 
 Q.scene('level2', function(stage){
-    
     Q.stageTMX('/levels/test-level.tmx', stage);
-    stage.insert(new Q.ShipItem());
-
     stage.add('viewport').follow(Q('Player').first());
-    Q.stageScene('hud', 1, { health: Q('Player').first().p.health, portals: Q('Spawner').length });
+    Q.stageScene('hud', 1, { health: Q('Player').first().p.health, items: Q('Player').first().p.items, portals: Q('Spawner').length });
 });
 
 Q.scene('level3', function(stage){
@@ -54,7 +55,7 @@ Q.scene('level3', function(stage){
     Q.stageTMX('/levels/map03.tmx', stage);
 
     stage.add('viewport').follow(Q('Player').first());
-    Q.stageScene('hud', 1, { health: Q('Player').first().p.health, portals: Q('Spawner').length });
+    Q.stageScene('hud', 1, { health: Q('Player').first().p.health, items: Q('Player').first().p.items, portals: Q('Spawner').length });
 });
 
 Q.scene('big', function(stage){

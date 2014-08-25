@@ -2,6 +2,16 @@
 <map version="1.0" orientation="orthogonal" width="25" height="25" tilewidth="64" tileheight="64">
  <tileset firstgid="1" name="tiles" tilewidth="64" tileheight="64">
   <image source="../images/tiles.png" width="640" height="640"/>
+  <tile id="20">
+   <properties>
+    <property name="Class" value="HealthPup"/>
+   </properties>
+  </tile>
+  <tile id="21">
+   <properties>
+    <property name="Class" value="ShipItem"/>
+   </properties>
+  </tile>
   <tile id="45">
    <properties>
     <property name="Class" value="Player"/>
@@ -1288,5 +1298,11 @@
   <object gid="52" x="369" y="433"/>
   <object gid="52" x="1416" y="1467"/>
   <object gid="52" x="847" y="1281"/>
+  <object gid="22" x="640" y="1536"/>
+  <object gid="22" x="1024" y="1536"/>
+  <object gid="22" x="640" y="384"/>
+  <object gid="21" x="832" y="1088"/>
+  <object gid="21" x="896" y="1088"/>
+  <object gid="21" x="960" y="1088"/>
  </objectgroup>
 </map>

@@ -21,10 +21,10 @@ Q.input.mouseControls({ cursor: 'on' });
 Q.gravityX = Q.gravityY = 0;
 
 Q.SPRITE_NONE = 0;
-Q.SPRITE_DOOR = 1;
+Q.SPRITE_PLAYER = 1;
 Q.SPRITE_COLLECTABLE = 2;
 Q.SPRITE_ENEMY = 4;
-Q.SPRITE_PLAYER = 8;
+Q.SPRITE_DOOR = 8;
 Q.SPRITE_BULLET = 16;
 Q.SPRITE_WALL = 32;
 
@@ -83,6 +83,11 @@ Q.loadTMX(['/images/laser.png',
         tileh: 48,
         sx: 0,
         sy: 8,
+    });
+
+    Q.sheet('tilemap', '/images/TILEMAP.png', {
+    	tilew: 64,
+    	tileh: 64
     });
 
     Q.stageScene('level1');

@@ -19,3 +19,8 @@ Q.animations('lasers', {
     idle:       { frames: [0] },
     flying:     { frames: [0,1,2,3], rate: 1/4 }
 });
+
+Q.animations('tilemap', {
+	turkey: 	{ frames: [39] },
+	dynamite: 	{ frames: [49] }
+});
