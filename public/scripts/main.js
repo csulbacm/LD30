@@ -1,5 +1,5 @@
 
-var Q = Quintus({ development: true });
+var Q = Quintus();
 
        Q.include('Sprites, Scenes, Input, 2D, Anim, UI, TMX, Touch')
         .setup({ maximize: true })
