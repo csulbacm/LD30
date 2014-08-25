@@ -1,10 +1,12 @@
 
-var Q = Quintus({ development: true });
+var Q = Quintus({ development: true, audioSupported: ['mp3'] });
 
-       Q.include('Sprites, Scenes, Input, 2D, Anim, UI, TMX, Touch')
+       Q.include('Sprites, Scenes, Input, 2D, Anim, UI, TMX, Touch, Audio')
         .setup({ maximize: true })
         .controls(true)
-        .touch(Q.SPRITE_ALL);
+        .touch(Q.SPRITE_ALL)
+        .enableSound();
+
 
 Q.input.keyboardControls({
     87: 'up',       // W
@@ -39,8 +41,15 @@ Q.astar = null;
 
 Q.el.addEventListener('mousedown', function(){
     var player = Q('Player').first();
-    if( player )
+    if( player ) {
         player.shoot();
+
+		// switch (Math.floor(Math.random() * (3))) {
+		// 	case 0: Q.audio.play("/sounds/p1.mp3"); break;
+		// 	case 1: Q.audio.play("/sounds/p3.mp3"); break;
+		// 	case 2: Q.audio.play("/sounds/p4.mp3"); break;
+		// }
+    }
 });
 
 Q.loadTMX(['/images/laser.png', 
@@ -53,8 +62,12 @@ Q.loadTMX(['/images/laser.png',
         '/images/player.png',
         '/images/TILEMAP.png',
         '/levels/map03.tmx',
+        '/sounds/p0.mp3', 	// a
+        '/sounds/p1.mp3',	// c
+        '/sounds/p2.mp3',	// d
+        '/sounds/p3.mp3',	// e
+        '/sounds/p4.mp3',	// g
     ], function(){
-    
     Q.sheet('player', '/images/player.png', {
         tilew: 64,
         tileh: 64,

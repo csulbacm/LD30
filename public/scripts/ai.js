@@ -161,6 +161,13 @@ Behavior_Shoot.prototype.step = function(dT, thisAi) {
 	dy = Math.sin(angle*Math.PI/180)*this.speed;
 
 	//	console.log('dx: '+dx+' dy: '+dy);
+	// switch (Math.floor(Math.random() * (5))) {
+	// 	case 0: Q.audio.play("/sounds/p0.mp3"); break;
+	// 	case 1: Q.audio.play("/sounds/p1.mp3"); break;
+	// 	case 2: Q.audio.play("/sounds/p2.mp3"); break;
+	// 	case 3: Q.audio.play("/sounds/p3.mp3"); break;
+	// 	case 4: Q.audio.play("/sounds/p4.mp3"); break;
+	// }
 	thisAi.self.stage.insert(new Q.Laser({ x:thisAi.self.p.x, y: thisAi.self.p.y,vx:dx, vy:dy, range: this.range, angle: angle+90, shooter: thisAi.self}));
 	thisAi.remove(this);
 }

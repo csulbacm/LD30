@@ -97,6 +97,14 @@ Q.Sprite.extend('Player', {
 		{
 			this.lastShotTime = 0;
 			this.shoot();
+
+			switch (Math.floor(Math.random() * (5))) {
+				case 0: Q.audio.play("/sounds/p0.mp3"); break;
+				case 1: Q.audio.play("/sounds/p1.mp3"); break;
+				case 2: Q.audio.play("/sounds/p2.mp3"); break;
+				case 3: Q.audio.play("/sounds/p3.mp3"); break;
+				case 4: Q.audio.play("/sounds/p4.mp3"); break;
+			}
 		}
 	},
 
