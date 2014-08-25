@@ -13,8 +13,9 @@ Q.Sprite.extend('Player', {
 			type: Q.SPRITE_PLAYER,
 			collisionMask: Q.SPRITE_WALL | Q.SPRITE_COLLECTABLE | Q.SPRITE_BULLET | Q.SPRITE_DOOR,
 			health: 10,
+			maxHealth: 10,
 			items: 0,
-			sensor: true
+			sensor: true,
 		});
 
 		this.lastShotTime = 0;
@@ -25,12 +26,6 @@ Q.Sprite.extend('Player', {
 		this.on('sensor', this.collisionCheck);
 		this.on('hit.sprite', this.collisionCheck);
 
-		/*
-		Q.input.on('up', this, 'goUp');
-		Q.input.on('left', this, 'goLeft');
-		Q.input.on('down', this, 'goDown');
-		Q.input.on('right', this, 'goRight');
-		*/
 		Q.input.on('action', this, 'closePortal');
 	},
 
@@ -39,9 +34,12 @@ Q.Sprite.extend('Player', {
 		{
 			if( collision.obj.isA('Spawner') )
 				this.portalTouching = collision.obj;
-			else if( collision.obj.isA('ShipItem') )
-			{
+			else if( collision.obj.isA('ShipItem') ){
 				this.foundItem();
+				collision.obj.destroy();
+			}
+			else if( collision.obj.isA('HealthPup') ){
+				this.heal( collision.obj.healthAmount );
 				collision.obj.destroy();
 			}
 		}
@@ -102,9 +100,18 @@ Q.Sprite.extend('Player', {
 		}
 	},
 
+	heal: function( amount ){
+		amount = amount || 10;
+		this.p.health += Math.abs(amount);
+		if( this.p.health > this.p.maxHealth )
+			this.p.health = this.p.maxHealth;
+		Q.clearStage(1);
+		Q.stageScene('hud', 1, { health: this.p.health, portals: Q('Spawner').length });
+	},
+
 	hit: function( dmg ){
 		dmg = dmg || 1;
-		this.p.health -= dmg;
+		this.p.health -= Math.abs(dmg);
 		Q.clearStage(1);
 		Q.stageScene('hud', 1, { health: this.p.health, portals: Q('Spawner').length });
 		if( this.p.health <= 0 )
@@ -166,7 +173,6 @@ Q.Sprite.extend('Enemy', {
 			if( this.p.vx < 0 )
 				this.play('walk_left');
 			else if( this.p.vx > 0 )
-				// TODO: Fix this by getting Suzy to flip sprites on sheet. Quintus flipping seems to be janky.
 				this.play('walk_right');
 			else
 				this.play('idle');
@@ -318,3 +324,17 @@ Q.Sprite.extend('Spawner', {
 		return this.p.dead;
 	}
 });
+
+Q.Sprite.extend('HealthPup', {
+	init: function(p){
+		this._super(p, {
+			healthAmount: 10,
+			asset: '/images/laser.png',
+			x: 0,
+			y: 0,
+			type: Q.SPRITE_COLLECTABLE,
+			collisionMask: Q.SPRITE_PLAYER,
+			sensor: true,
+		});
+	}
+})

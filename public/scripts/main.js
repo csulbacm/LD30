@@ -52,10 +52,6 @@ Q.loadTMX(['/images/dragon_hit1.png',
     ], function(){
     
     Q.sheet('player', '/images/player.png', {
-        /*
-        tilew: 67.71,
-        tileh: 67.75,
-        */
         tilew: 64,
         tileh: 64,
         sx: 0,
