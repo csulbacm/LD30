@@ -160,6 +160,8 @@ Behavior_Attack.prototype.step = function(dT, thisAi) {
 	The cost can be increased if that edge should be advoided but there shouldn't be
 	any need in this program.
 */
+
+
 function node(index, edges, x, y) {
 	this.index = index;
 	this.edges = edges;
@@ -172,14 +174,14 @@ function node(index, edges, x, y) {
 	visited = false;
 }
 
-node.prototype.setAstar(parent, cost, distance) {
+node.prototype.setAstar = function(parent, cost, distance) {
 	this.parent = parent;
 	this.cost = cost;
 	this.distance = distance;
 }
 
-node.prototype.total_cost = funtion() {
-	return cost + distance;
+node.prototype.total_cost = function() {
+	return this.cost + this.distance;
 }
 
 function edge(index, cost) {
@@ -189,19 +191,17 @@ function edge(index, cost) {
 
 function Astar(nodeList) {
 	this.nodeList = nodeList;
-	this.start = 0;
-	this.end = 0;
 }
 
 
-Astar.prototype.get_distance(start_i, end_i) {
+Astar.prototype.get_distance = function(start_i, end_i) {
 	start = this.nodeList[start_i];
 	end = this.nodeList[end_i];
 
 	return Math.abs(start.x-end.x) + Math.abs(start.y-end.y);
 }
 
-Astar.prototype.find_path(start_i, end_i) {
+Astar.prototype.find_path = function(start_i, end_i) {
 
 	//clean up all nodes
 	for(i=0; i<this.nodeList.length; i++) {
@@ -249,13 +249,13 @@ Astar.prototype.find_path(start_i, end_i) {
 
 			if(!cur2.visited) {
 				if(cur2.cost == -1) { 
-					cur2.setAstar(cur.index, edges[i].cost + cur.cost, get_distance(cur2.index, end_i));
+					cur2.setAstar(cur.index, edges[i].cost + cur.cost, this.get_distance(cur2.index, end_i));
 					open_list.push(cur2);
 				}
 				//check if the new cost to is less
 				else if(edges[i].cost + cur.cost < cur2.cost) {
 					//this is a shorter way to reach this node
-					cur2.setAstar(cur.index, edges[i].cost + cur.cost, get_distance(cur2.index, end_i));
+					cur2.setAstar(cur.index, edges[i].cost + cur.cost, this.get_distance(cur2.index, end_i));
 					open_list.heapify();
 				}
 			}
@@ -263,3 +263,4 @@ Astar.prototype.find_path(start_i, end_i) {
 		}
 	}
 }
+
