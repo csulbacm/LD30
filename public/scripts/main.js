@@ -46,7 +46,6 @@ Q.el.addEventListener('mousedown', function(){
 Q.loadTMX(['/images/laser.png', 
         '/levels/test-level.tmx',
         '/levels/test-level2.tmx',
-        '/levels/big-test.tmx',
         '/images/tiles.png',
         '/images/portals.png',
         '/images/robots.png',

@@ -114,8 +114,8 @@ Q.Sprite.extend('Player', {
 		this.p.health -= Math.abs(dmg);
 		Q.clearStage(1);
 		Q.stageScene('hud', 1, { health: this.p.health, portals: Q('Spawner').length });
-		//if( this.p.health <= 0 )
-		//	this.kill();
+		if( this.p.health <= 0 )
+			this.kill();
 	},
 
 	kill: function(){
