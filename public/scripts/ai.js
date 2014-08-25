@@ -160,9 +160,26 @@ Behavior_Attack.prototype.step = function(dT, thisAi) {
 	The cost can be increased if that edge should be advoided but there shouldn't be
 	any need in this program.
 */
-function node(index, edges) {
+function node(index, edges, x, y) {
 	this.index = index;
 	this.edges = edges;
+	this.x = x;
+	this.y = y;
+	this.parent = -1;
+	this.cost = -1;
+	this.distance = -1;
+	this.run = -1;
+	visited = false;
+}
+
+node.prototype.setAstar(parent, cost, distance) {
+	this.parent = parent;
+	this.cost = cost;
+	this.distance = distance;
+}
+
+node.prototype.total_cost = funtion() {
+	return cost + distance;
 }
 
 function edge(index, cost) {
@@ -170,24 +187,79 @@ function edge(index, cost) {
 	this.cost = cost;
 }
 
-function Astar_Node(index, cost, distance) {
-	//index is the index of node this is refering to
-	//cost is the total cost up to this point
-	//distance is the manhatan distance from here to the end
-	this.index = index;
-	this.cost = cost;
-	this.distance = distance;
-}
-
-Astar_Node.prototype.total_cost = funtion() {
-	return cost + distance;
-}
-
-
 function Astar(nodeList) {
 	this.nodeList = nodeList;
 	this.start = 0;
 	this.end = 0;
-	this.open_list = new Array();
-	this.closed_list
+}
+
+
+Astar.prototype.get_distance(start_i, end_i) {
+	start = this.nodeList[start_i];
+	end = this.nodeList[end_i];
+
+	return Math.abs(start.x-end.x) + Math.abs(start.y-end.y);
+}
+
+Astar.prototype.find_path(start_i, end_i) {
+
+	//clean up all nodes
+	for(i=0; i<this.nodeList.length; i++) {
+		this.nodeList[i].setAstar(-1,-1, -1);
+		this.nodeList[i].visited = false;
+	}
+
+	start = this.nodeList[start_i];
+	end = this.nodeList[end_i];
+	start.setAstar(-1, 0, this.get_distance(start.index, end.index));
+	open_list = new Heap(function(a, b) {return a.total_cost() - b.total_cost;});
+	//closed_list = new Heap(function(a, b) {return a.total_cost() - b.total_cost;});
+
+	
+
+	open_list.push(start_node);
+
+
+	while(!open_list.empty()) {
+		cur = open_list.pop();
+
+		//check if this is the end
+		if(cur.index == end_i) {
+			//make list of points
+			points = Array();
+			points.push({x:cur.x, y:cur.y});
+			cur = this.nodeList[cur.parent];
+			while(cur.index != start_i) {
+				points.push({x:cur.x, y:cur.y});
+				cur = this.nodeList[cur.parent];
+			}
+			return points;
+		}
+
+		//mark that node has been visited
+		visited[cur.index] = true;
+
+		//add to list of visited nodes
+		//closed_list.push(cur);
+
+		//find all edges
+		edges = this.nodeList[cur.index].edges;
+		for(i=0; i<edges.length; i++) {
+			cur2 = this.nodeList[edges[i].index];
+
+			if(!cur2.visited) {
+				if(cur2.cost == -1) { 
+					cur2.setAstar(cur.index, edges[i].cost + cur.cost, get_distance(cur2.index, end_i));
+					open_list.push(cur2);
+				}
+				//check if the new cost to is less
+				else if(edges[i].cost + cur.cost < cur2.cost) {
+					//this is a shorter way to reach this node
+					cur2.setAstar(cur.index, edges[i].cost + cur.cost, get_distance(cur2.index, end_i));
+					open_list.heapify();
+				}
+			}
+
+		}
+	}
 }
