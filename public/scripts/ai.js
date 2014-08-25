@@ -1,3 +1,13 @@
+/* TODO: 
+	write function for astar to accept points instead of indecies of start and end nodes
+
+	finish step for Behavior_Follow_Astar
+
+	astar is untested so it might need fixing
+ *
+ *
+*/
+
 function Ai(self) {
 	this.behaviors = new Array();
 	this.self = self;
@@ -50,7 +60,7 @@ Behavior.prototype.step = function(dT, thisAi) {
 }
 
 function Behavior_Follow(priority, target, range) {
-	Behavior.call('follow', priority);
+	Behavior.call('move', priority);
 	this.target = target;
 	this.range = range;
 }
@@ -79,8 +89,25 @@ Behavior_Follow.prototype.step = function(dT, thisAi) {
 	thisAi.self.p.vy = dy;
 }
 
-function Behavior_Follow_Path(priority, points) {
+function Behavior_Follow_Astar(priority, target) {
 	Behavior.call('follow', priority);
+	this.target = target;
+	this.path = null;
+}
+
+Behavior_Follow.prototype.step = function(dT, thisAi) {
+	if(this.path == null) {
+		//create and add a path follow
+	} else {
+		//check if end is close to player
+		//if not, pathfind
+		//lower threshold for pathfinding when closser
+			//should be looking for a shorter path anyways
+	}
+}
+
+function Behavior_Follow_Path(priority, points) {
+	Behavior.call('move', priority);
 	this.points = points;
 	this.cur = 0;
 	this.thresh = 1;
