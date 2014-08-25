@@ -21,16 +21,17 @@ Q.input.mouseControls({ cursor: 'on' });
 Q.gravityX = Q.gravityY = 0;
 
 Q.SPRITE_NONE = 0;
-Q.SPRITE_PLAYER = 1;
+Q.SPRITE_DOOR = 1;
 Q.SPRITE_COLLECTABLE = 2;
 Q.SPRITE_ENEMY = 4;
-Q.SPRITE_DOOR = 8;
+Q.SPRITE_PLAYER = 8;
 Q.SPRITE_BULLET = 16;
 Q.SPRITE_WALL = 32;
 
 Q.levels = [
 	'level1',
-	'level2'
+	'level2',
+	'level3'
 ];
 
 
@@ -49,6 +50,9 @@ Q.loadTMX(['/images/dragon_hit1.png',
         '/images/robots.png',
         '/images/lasers.png',
         '/images/player.png',
+        '/levels/test-level-3.tmx',
+        '/images/TILEMAP.png',
+        '/levels/map03.tmx'
     ], function(){
     
     Q.sheet('player', '/images/player.png', {
@@ -81,6 +85,6 @@ Q.loadTMX(['/images/dragon_hit1.png',
         sy: 8,
     });
 
-    Q.stageScene('level2');
+    Q.stageScene('level3');
     Q.GameState.level = 0;
 });

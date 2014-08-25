@@ -11,7 +11,7 @@ Q.Sprite.extend('Player', {
 			vy: 1,
 			speed: 200,
 			type: Q.SPRITE_PLAYER,
-			collisionMask: Q.SPRITE_WALL | Q.SPRITE_COLLECTABLE | Q.SPRITE_BULLET | Q.SPRITE_DOOR,
+			collisionMask: Q.SPRITE_WALL | Q.SPRITE_COLLECTABLE | Q.SPRITE_BULLET /*| Q.SPRITE_DOOR*/,
 			health: 10,
 			maxHealth: 10,
 			items: 0,
@@ -32,6 +32,7 @@ Q.Sprite.extend('Player', {
 	collisionCheck: function(collision){
 		if( collision.obj )
 		{
+			console.log( collision.obj.p.type )
 			if( collision.obj.isA('Spawner') )
 				this.portalTouching = collision.obj;
 			else if( collision.obj.isA('ShipItem') ){
@@ -65,6 +66,7 @@ Q.Sprite.extend('Player', {
 	},
 
 	step: function(dt){
+		//console.log( 'X: ' + this.p.x + ' Y: ' + this.p.y );
 		this.portalTouching = null;
 		this.p.vx = this.p.vy = 0;
 		this.lastShotTime += dt;
@@ -201,14 +203,14 @@ Q.Sprite.extend('Laser', {
 			y: 0,
 			w: 26,
 			h: 48,
-			vx: 0,
-			vy: 0,
+			vx: 1,
+			vy: 1,
 			speed: 200,
 			target: this,
 			range: 1000,
 			distance: 0,
 			type: Q.SPRITE_BULLET,
-			collisionMask: Q.SPRITE_WALL | Q.SPRITE_PLAYER | Q.SPRITE_ENEMY,
+			collisionMask:  Q.SPRITE_PLAYER | Q.SPRITE_ENEMY,
 			sensor: true,
 			shooter: null,
 		});
@@ -221,6 +223,7 @@ Q.Sprite.extend('Laser', {
 
 	collisionCheck: function(collision){
 		if( collision.obj ){
+			console.log( collision.obj.p.type );
 			if(collision.obj.isA('Player') || collision.obj.isA('Enemy')){
 				if(collision.obj != this.p.shooter && collision.obj.p.type != this.p.shooter.p.type){
 					collision.obj.hit( 1 );
@@ -236,6 +239,7 @@ Q.Sprite.extend('Laser', {
 	},
 
 	step: function(dt){
+		//console.log( Q.inputs['mouseY'] );
 		this.p.x += this.p.vx * dt;
 		this.p.y += this.p.vy * dt;
 		step_size = Math.sqrt(this.p.vx * dt*this.p.vx * dt + this.p.vy * dt*this.p.vy * dt);
@@ -246,6 +250,7 @@ Q.Sprite.extend('Laser', {
 			this.destroy();
 		}
 	}
+	
 
 });
 
