@@ -157,8 +157,8 @@ Behavior_Shoot.prototype.step = function(dT, thisAi) {
 	angle = ((Math.atan2(dy, dx) * 180/Math.PI))
 	//add some randomness
 	angle += (Math.random()-.5)*45;
-	dx = Math.cos(angle*Math.PI/180)*this.speed;
-	dy = Math.sin(angle*Math.PI/180)*this.speed;
+	dx = Math.cos(angle*Math.PI/180);
+	dy = Math.sin(angle*Math.PI/180);
 
 	//	console.log('dx: '+dx+' dy: '+dy);
 	thisAi.self.stage.insert(new Q.Laser({ x:thisAi.self.p.x, y: thisAi.self.p.y,vx:dx, vy:dy, range: this.range, angle: angle+90, shooter: thisAi.self}));

@@ -29,9 +29,9 @@ Q.SPRITE_BULLET = 16;
 Q.SPRITE_WALL = 32;
 
 Q.levels = [
-	'level1',
-	'level2',
-	'level3'
+	'level3',
+    'level1',
+    'level2',
 ];
 
 Q.astar = null;
@@ -90,7 +90,7 @@ Q.loadTMX(['/images/laser.png',
     	tileh: 64
     });
 
-    Q.stageScene('level1');
+    Q.GameState.level = 1;
+    Q.stageScene( Q.levels[Q.GameState.level] );
     Q.astar = new Astar();
-    Q.GameState.level = 0;
 });

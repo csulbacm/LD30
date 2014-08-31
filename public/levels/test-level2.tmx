@@ -2,6 +2,11 @@
 <map version="1.0" orientation="orthogonal" width="25" height="25" tilewidth="64" tileheight="64">
  <tileset firstgid="1" name="tiles" tilewidth="64" tileheight="64">
   <image source="../images/tiles.png" width="640" height="640"/>
+  <tile id="1">
+   <properties>
+    <property name="Class" value="Spawner"/>
+   </properties>
+  </tile>
   <tile id="20">
    <properties>
     <property name="Class" value="HealthPup"/>
@@ -1304,5 +1309,11 @@
   <object gid="21" x="832" y="1088"/>
   <object gid="21" x="896" y="1088"/>
   <object gid="21" x="960" y="1088"/>
+  <object gid="2" x="768" y="1344"/>
+  <object gid="2" x="832" y="1344"/>
+  <object gid="2" x="896" y="1344"/>
+  <object gid="22" x="768" y="1472"/>
+  <object gid="22" x="832" y="1472"/>
+  <object gid="22" x="896" y="1472"/>
  </objectgroup>
 </map>

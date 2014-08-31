@@ -12,8 +12,8 @@ Q.Sprite.extend('Player', {
 			speed: 200,
 			type: Q.SPRITE_PLAYER,
 			collisionMask: Q.SPRITE_WALL | Q.SPRITE_COLLECTABLE | Q.SPRITE_BULLET | Q.SPRITE_DOOR,
-			health: 10,
-			maxHealth: 10,
+			health: 20,
+			maxHealth: 20,
 			items: 0,
 			sensor: true,
 		});
@@ -32,21 +32,22 @@ Q.Sprite.extend('Player', {
 	collisionCheck: function(collision){
 		if( collision.obj )
 		{
-			if( collision.obj.isA('Spawner') )
+			if( collision.obj.isA('Spawner') && collision.obj.isDead() == false ){
 				this.portalTouching = collision.obj;
+			}
 			else if( collision.obj.isA('ShipItem') ){
 				this.foundItem();
 				collision.obj.destroy();
 			}
-			else if( collision.obj.isA('HealthPup') ){
+			else if( collision.obj.isA('HealthPup') && collision.obj.isDead() == false ){
 				this.heal( collision.obj.p.healthAmount );
-				collision.obj.destroy();
+				collision.obj.kill();
 			}
 		}
 	},
 
 	closePortal: function(){
-		if( this.portalTouching && this.p.items > 0 )
+		if( this.portalTouching && this.p.items > 0 && this.portalTouching.isDead() == false )
 		{
 			this.p.items -= 1;
 			this.portalTouching.closePortal();
@@ -54,13 +55,6 @@ Q.Sprite.extend('Player', {
 
 			var portalsLeft = ( Q('Spawner').length - 1 );
 			Q.stageScene('hud', 1, { health: this.p.health, items: this.p.items, portals: portalsLeft });
-
-			if( portalsLeft <= 0 ){
-				if( Q.GameState.level + 1 >= Q.levels.length )
-					Q.stageScene('GameOver',2, { textLabel: 'You Won', buttonLabel: 'Play Again?' });
-				else
-					Q.stageScene('NextLevel',2);
-			}
 		}
 	},
 
@@ -114,8 +108,7 @@ Q.Sprite.extend('Player', {
 		this.p.health -= Math.abs(dmg);
 		Q.clearStage(1);
 		Q.stageScene('hud', 1, { health: this.p.health, items: this.p.items, portals: Q('Spawner').length });
-		if( this.p.health <= 0 )
-			this.kill();
+		if( this.p.health <= 0 ) this.kill();
 	},
 
 	kill: function(){
@@ -135,8 +128,8 @@ Q.Sprite.extend('Player', {
 		var dy = (Q.inputs['mouseY'] - this.p.y);
 		var angle = ((Math.atan2(dy, dx) * 180/Math.PI))
 		
-		dx = Math.cos(angle*Math.PI/180)*200;
-		dy = Math.sin(angle*Math.PI/180)*200;
+		dx = Math.cos(angle*Math.PI/180);
+		dy = Math.sin(angle*Math.PI/180);
 
 		var laser = new Q.Laser({ x: this.p.x, y: this.p.y,vx:dx, vy:dy, angle: angle+90, shooter: this});
 		this.stage.insert(laser);
@@ -205,7 +198,7 @@ Q.Sprite.extend('Laser', {
 			h: 48,
 			vx: 1,
 			vy: 1,
-			speed: 400,
+			speed: 500,
 			target: this,
 			range: 1000,
 			distance: 0,
@@ -213,7 +206,10 @@ Q.Sprite.extend('Laser', {
 			collisionMask:  Q.SPRITE_WALL | Q.SPRITE_PLAYER | Q.SPRITE_ENEMY | Q.SPRITE_DOOR,
 			sensor: true,
 			shooter: null,
+			dead: false,
 		});
+		this.p.vx *= this.p.speed;
+		this.p.vy *= this.p.speed;
 		this.add('2d, animation');
 		this.play('flying');
 
@@ -222,17 +218,17 @@ Q.Sprite.extend('Laser', {
 	},
 
 	collisionCheck: function(collision){
-		if( collision.obj ){
+		if( collision.obj && this.isDead() == false ){
 			if(collision.obj.isA('Player') || collision.obj.isA('Enemy')){
 				if(collision.obj != this.p.shooter && collision.obj.p.type != this.p.shooter.p.type){
 					collision.obj.hit( 1 );
-					this.destroy();
+					this.kill();
 				}
 			}
 			else if( collision.obj.p.type == Q.SPRITE_WALL ){
 				if(this.p.shooter)
 					this.p.shooter.p.projectile = null;
-				this.destroy();
+				this.kill();
 			}
 		}
 	},
@@ -247,8 +243,17 @@ Q.Sprite.extend('Laser', {
 		else if(step_size < .1) {
 			this.destroy();
 		}
+	},
+
+	kill: function(){
+		this.p.dead = true;
+		this.p.type = Q.SPRITE_NONE;
+		this.destroy();
+	},
+
+	isDead: function(){
+		return this.p.dead;
 	}
-	
 
 });
 
@@ -301,13 +306,22 @@ Q.Sprite.extend('Spawner', {
 		if( this.isDead() )
 		{
 			this.p.startDeadTimer += dt;
-			if( this.p.startDeadTimer >= 1 )
+			if( this.p.startDeadTimer >= 1 ){
+				// Check if it is the last portal alive.
+				var portalsLeft = ( Q('Spawner').length - 1 );
+				if( portalsLeft <= 0 ){
+					if( Q.GameState.level + 1 >= Q.levels.length )
+						Q.stageScene('GameOver',2, { textLabel: 'You Won', buttonLabel: 'Play Again?' });
+					else
+						Q.stageScene('NextLevel',2);
+				}
 				this.destroy();
+			}
 		}
 	},
 
 	spawnUnit: function(){
-		if( this.p.spawned < this.p.spawnLimit )
+		if( this.p.spawned < this.p.spawnLimit && this.isDead() == false )
 		{
 			var enemy = new Q.Enemy({ x: this.p.x, y: this.p.y, spawner: this });
 			var ai = new Ai(enemy);
@@ -323,6 +337,7 @@ Q.Sprite.extend('Spawner', {
 	closePortal: function(){
 		this.play('close');
 		this.p.dead = true;
+		this.p.type = Q.Sprite_NONE;
 	},
 
 	isDead: function(){
@@ -341,8 +356,19 @@ Q.Sprite.extend('HealthPup', {
 			type: Q.SPRITE_COLLECTABLE,
 			collisionMask: Q.SPRITE_PLAYER,
 			sensor: true,
+			dead: false,
 		});
 		this.add('2d, animation');
 		this.play('turkey');
+	},
+
+	kill: function(){
+		this.p.dead = true;
+		this.p.type = Q.SPRITE_NONE;
+		this.destroy();
+	},
+
+	isDead: function(){
+		return this.p.dead;
 	}
 })
