@@ -8,9 +8,15 @@ Q.scene('hud', function(stage){
 		y: 50
 	}));
 
-	containerLeft.insert(new Q.UI.Text({
+	var healthText = containerLeft.insert(new Q.UI.Text({
     	label: 'Health: ' + stage.options.health,
     	color: 'green'
+    }));
+
+    containerLeft.insert(new Q.UI.Text({
+    	label: 'Lives: ' + Q.GameState.lives,
+    	color: 'green',
+    	x: 40 + healthText.p.w
     }));
 
 	var containerRight = stage.insert(new Q.UI.Container({
@@ -68,8 +74,11 @@ Q.scene('big', function(stage){
 Q.scene('GameOver', function(stage){
 	Q.stage(0).pause();
 
-	var textLabel = stage.options.textLabel || 'Game Over';
+	var textLabel = stage.options.textLabel || 'You Died';
 	var buttonLabel = stage.options.buttonLabel || 'Continue?';
+
+	if( Q.GameState.lives <= 0 )
+		textLabel = 'Game Over';
 
 	var container = stage.insert(new Q.UI.Container({
 		fill: 'white',
@@ -88,7 +97,8 @@ Q.scene('GameOver', function(stage){
 		fill: '#CCCCCC'
 	}, function(){
 		Q.clearStages();
-		Q.GameState.level = 0;
+		if( Q.GameState.lives <= 0 )
+			Q.GameState.level = 0;
 		Q.stageScene( Q.levels[ Q.GameState.level ] );
 	}));
 

@@ -44,7 +44,8 @@ Q.el.addEventListener('mousedown', function(){
 });
 
 Q.el.addEventListener('mousemove', function(){
-    Q("Player").first().p.mouseMoved = true;
+    if( Q("Player").first() )
+        Q("Player").first().p.mouseMoved = true;
 });
 
 Q.loadTMX(['/images/laser.png', 
@@ -100,6 +101,8 @@ Q.loadTMX(['/images/laser.png',
     	tileh: 64
     });
 
+    Q.GameState.maxLives = 3;
+    Q.GameState.lives = Q.GameState.maxLives;
     Q.GameState.level = 0;
     Q.stageScene( Q.levels[Q.GameState.level] );
     Q.astar = new Astar();
@@ -108,7 +111,9 @@ Q.loadTMX(['/images/laser.png',
         // TODO: Get this working right. Meant to display a progress bar for asset loading.
         var loadingPercent = Math.floor(loaded/total*100);
         document.getElementById('loading-label').innerHTML = 'Loading: ' + loadingPercent + '%';
-        if( loaded == total )
+        if( loaded == total ){
             document.getElementById('loading-label').remove();
+            document.getElementsByTagName('canvas')[0].style.backgroundColor = 'black';
+        }
     }
 });

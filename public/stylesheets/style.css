@@ -9,10 +9,14 @@ canvas
 {
 	display: block;
 	margin: 0 auto;
-	background-color: black;
+	/* background-color: black; */
 }
 
-div
-{
+#loading-label{
 	color: green;
+	text-align: center;
+	display: block;
+	width: 100%;
+	margin: 0 auto;
+	font-size: 5em;
 }

@@ -125,6 +125,7 @@ Q.Sprite.extend('Player', {
 	kill: function(){
 		this.stage.unfollow( this );
 		this.destroy();
+		Q.GameState.lives -= 1;
 		Q.stageScene('GameOver',2)
 	},
 
