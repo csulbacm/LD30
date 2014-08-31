@@ -64,6 +64,12 @@ Q.scene('level3', function(stage){
     Q.stageScene('hud', 1, { health: Q('Player').first().p.health, items: Q('Player').first().p.items, portals: Q('Spawner').length });
 });
 
+Q.scene('level4', function(stage){
+    Q.stageTMX('/levels/level-4.tmx', stage);
+    stage.add('viewport').follow(Q('Player').first());
+    Q.stageScene('hud', 1, { health: Q('Player').first().p.health, items: Q('Player').first().p.items, portals: Q('Spawner').length });
+});
+
 Q.scene('big', function(stage){
     Q.stageTMX('/levels/big-test.tmx', stage);
     stage.add('viewport').follow(Q('Player').first());

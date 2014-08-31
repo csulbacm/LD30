@@ -1312,13 +1312,13 @@
   <object gid="21" x="896" y="1024"/>
   <object gid="21" x="832" y="960"/>
   <object gid="21" x="960" y="960"/>
-  <object gid="2" x="62" y="710"/>
-  <object gid="2" x="1488" y="680"/>
   <object gid="2" x="897" y="1155"/>
   <object gid="21" x="1475" y="117"/>
   <object gid="21" x="49" y="117"/>
   <object gid="22" x="875" y="201"/>
   <object gid="22" x="720" y="1568"/>
   <object gid="22" x="1246" y="1574"/>
+  <object gid="2" x="128" y="704"/>
+  <object gid="2" x="1344" y="704"/>
  </objectgroup>
 </map>

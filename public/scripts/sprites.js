@@ -62,6 +62,7 @@ Q.Sprite.extend('Player', {
 		{
 			this.p.items -= 1;
 			this.portalTouching.closePortal();
+			this.portalTouching = null;
 			Q.clearStage(1);
 
 			var portalsLeft = ( Q('Spawner').length - 1 );
@@ -399,4 +400,4 @@ Q.Sprite.extend('HealthPup', {
 	isDead: function(){
 		return this.p.dead;
 	}
-})
+});

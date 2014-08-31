@@ -32,6 +32,7 @@ Q.levels = [
 	'level3',
     'level1',
     'level2',
+    'level4',
 ];
 
 Q.astar = null;
@@ -58,6 +59,7 @@ Q.loadTMX(['/images/laser.png',
         '/images/player.png',
         '/images/TILEMAP.png',
         '/levels/map03.tmx',
+        '/levels/level-4.tmx',
     ], function(){
     
     Q.sheet('player', '/images/player.png', {
@@ -108,7 +110,6 @@ Q.loadTMX(['/images/laser.png',
     Q.astar = new Astar();
 }, {
     progressCallback: function(loaded, total){
-        // TODO: Get this working right. Meant to display a progress bar for asset loading.
         var loadingPercent = Math.floor(loaded/total*100);
         document.getElementById('loading-label').innerHTML = 'Loading: ' + loadingPercent + '%';
         if( loaded == total ){
