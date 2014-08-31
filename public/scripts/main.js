@@ -1,8 +1,8 @@
 
-var Q = Quintus();
+var Q = Quintus({ development: true });
 
        Q.include('Sprites, Scenes, Input, 2D, Anim, UI, TMX, Touch')
-        .setup({ maximize: true })
+        .setup({ width: 800, height: 600 })
         .controls(true)
         .touch(Q.SPRITE_ALL);
 
@@ -41,6 +41,10 @@ Q.el.addEventListener('mousedown', function(){
     var player = Q('Player').first();
     if( player )
         player.shoot();
+});
+
+Q.el.addEventListener('mousemove', function(){
+    Q("Player").first().p.mouseMoved = true;
 });
 
 Q.loadTMX(['/images/laser.png', 
@@ -99,4 +103,12 @@ Q.loadTMX(['/images/laser.png',
     Q.GameState.level = 0;
     Q.stageScene( Q.levels[Q.GameState.level] );
     Q.astar = new Astar();
+}, {
+    progressCallback: function(loaded, total){
+        // TODO: Get this working right. Meant to display a progress bar for asset loading.
+        var loadingPercent = Math.floor(loaded/total*100);
+        document.getElementById('loading-label').innerHTML = 'Loading: ' + loadingPercent + '%';
+        if( loaded == total )
+            document.getElementById('loading-label').remove();
+    }
 });

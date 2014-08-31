@@ -12,6 +12,15 @@ Q.Sprite.extend('Player', {
 			cx: 32,
 			cy: 32,
 			speed: 200,
+			shootDelay: 0.125,
+			mouseMoved: true,
+			laserData: {
+				sx: 0,
+				sy: 0,
+				dx: 0,
+				dy: 0,
+				angle: 0,
+			},
 			type: Q.SPRITE_PLAYER,
 			collisionMask: Q.SPRITE_WALL | Q.SPRITE_COLLECTABLE | Q.SPRITE_BULLET | Q.SPRITE_DOOR,
 			health: 20,
@@ -89,7 +98,7 @@ Q.Sprite.extend('Player', {
 		this.p.x += this.p.vx * dt;
 		this.p.y += this.p.vy * dt;
 
-		if( this.lastShotTime > 0.25 )
+		if( this.lastShotTime > this.p.shootDelay )
 		{
 			this.lastShotTime = 0;
 			this.shoot();
@@ -126,17 +135,28 @@ Q.Sprite.extend('Player', {
 	},
 
 	shoot: function(){
-		var dx = (Q.inputs['mouseX'] - this.p.x);
-		var dy = (Q.inputs['mouseY'] - this.p.y);
-		var angle = ((Math.atan2(dy, dx) * 180/Math.PI))
-		
-		dx = Math.cos(angle*Math.PI/180);
-		dy = Math.sin(angle*Math.PI/180);
+		if( this.p.mouseMoved )
+		{
+			this.p.laserData.dx = (Q.inputs['mouseX'] - this.p.x);
+			this.p.laserData.dy = (Q.inputs['mouseY'] - this.p.y);
+			this.p.laserData.angle = ((Math.atan2(this.p.laserData.dy, this.p.laserData.dx) * 180/Math.PI))
+			
+			this.p.laserData.dx = Math.cos(this.p.laserData.angle*Math.PI/180);
+			this.p.laserData.dy = Math.sin(this.p.laserData.angle*Math.PI/180);
 
-		var cx = this.p.x + this.p.w/2.0 * dx;
-		var cy = this.p.y + this.p.h/2.0 * dy;
+			this.p.mouseMoved = false;
+		}
+		this.p.laserData.cx = this.p.x + this.p.w/2.0 * this.p.laserData.dx;
+		this.p.laserData.cy = this.p.y + this.p.h/2.0 * this.p.laserData.dy;
 
-		var laser = new Q.Laser({ x: cx, y: cy, vx:dx, vy:dy, angle: angle+90, shooter: this});
+		var laser = new Q.Laser({
+			x: this.p.laserData.cx,
+			y: this.p.laserData.cy,
+			vx: this.p.laserData.dx,
+			vy: this.p.laserData.dy,
+			angle: this.p.laserData.angle+90,
+			shooter: this
+		});
 		this.stage.insert(laser);
 	}
 

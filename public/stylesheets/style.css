@@ -8,5 +8,11 @@
 canvas
 {
 	display: block;
+	margin: 0 auto;
 	background-color: black;
+}
+
+div
+{
+	color: green;
 }
