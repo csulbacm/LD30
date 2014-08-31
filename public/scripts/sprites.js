@@ -9,6 +9,8 @@ Q.Sprite.extend('Player', {
 			h: 64,
 			vx: 1,
 			vy: 1,
+			cx: 32,
+			cy: 32,
 			speed: 200,
 			type: Q.SPRITE_PLAYER,
 			collisionMask: Q.SPRITE_WALL | Q.SPRITE_COLLECTABLE | Q.SPRITE_BULLET | Q.SPRITE_DOOR,
@@ -131,7 +133,10 @@ Q.Sprite.extend('Player', {
 		dx = Math.cos(angle*Math.PI/180);
 		dy = Math.sin(angle*Math.PI/180);
 
-		var laser = new Q.Laser({ x: this.p.x, y: this.p.y,vx:dx, vy:dy, angle: angle+90, shooter: this});
+		var cx = this.p.x + this.p.w/2.0 * dx;
+		var cy = this.p.y + this.p.h/2.0 * dy;
+
+		var laser = new Q.Laser({ x: cx, y: cy, vx:dx, vy:dy, angle: angle+90, shooter: this});
 		this.stage.insert(laser);
 	}
 
@@ -194,10 +199,12 @@ Q.Sprite.extend('Laser', {
 			sprite: 'lasers',
 			x: 0,
 			y: 0,
-			w: 26,
-			h: 48,
+			w: 3,
+			h: 36,
 			vx: 1,
 			vy: 1,
+			cx: 1.5,
+			cy: 18,
 			speed: 500,
 			target: this,
 			range: 1000,
@@ -211,7 +218,7 @@ Q.Sprite.extend('Laser', {
 		this.p.vx *= this.p.speed;
 		this.p.vy *= this.p.speed;
 		this.add('2d, animation');
-		this.play('flying');
+		this.play('idle');
 
 		this.on('sensor', this.collisionCheck);
 		this.on('hit', this.collisionCheck);

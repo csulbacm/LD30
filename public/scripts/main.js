@@ -79,10 +79,16 @@ Q.loadTMX(['/images/laser.png',
     });
 
     Q.sheet('lasers', '/images/lasers.png', {
+        /*
         tilew: 64,
         tileh: 48,
         sx: 0,
         sy: 8,
+        */
+        tilew: 3,
+        tileh: 36,
+        sx: 29,
+        sy: 14,
     });
 
     Q.sheet('tilemap', '/images/TILEMAP.png', {
@@ -90,7 +96,7 @@ Q.loadTMX(['/images/laser.png',
     	tileh: 64
     });
 
-    Q.GameState.level = 1;
+    Q.GameState.level = 0;
     Q.stageScene( Q.levels[Q.GameState.level] );
     Q.astar = new Astar();
 });

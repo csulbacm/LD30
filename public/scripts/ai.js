@@ -160,8 +160,11 @@ Behavior_Shoot.prototype.step = function(dT, thisAi) {
 	dx = Math.cos(angle*Math.PI/180);
 	dy = Math.sin(angle*Math.PI/180);
 
+	var cx = thisAi.self.p.x + thisAi.self.p.w/2.0 * dx;
+	var cy = thisAi.self.p.y + thisAi.self.p.h/2.0 * dy;
+
 	//	console.log('dx: '+dx+' dy: '+dy);
-	thisAi.self.stage.insert(new Q.Laser({ x:thisAi.self.p.x, y: thisAi.self.p.y,vx:dx, vy:dy, range: this.range, angle: angle+90, shooter: thisAi.self}));
+	thisAi.self.stage.insert(new Q.Laser({ x: cx, y: cy, vx: dx, vy: dy, range: this.range, angle: angle+90, shooter: thisAi.self}));
 	thisAi.remove(this);
 }
 
